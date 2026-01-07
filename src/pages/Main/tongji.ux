@@ -1,0 +1,545 @@
+<template>
+  <div class="page">
+    <div class="scroll-wrapper">
+      <stack class="top-stack">
+        <!-- Background Image -->
+        <image class="top-bg" src="../../assets/img/shouyedingbg.png" resize-mode="cover"></image>
+        
+        <div class="main-content">
+           <!-- Header -->
+           <div class="header-row">
+             <text class="page-title">统计</text>
+             <image class="eye-icon" src="../../assets/img/yanjing.png"></image>
+           </div>
+           
+           <!-- Tabs (Steps, Duration, Consumption) -->
+           <div class="tabs-row">
+             <div class="tab-btn {{currentTab === 0 ? 'tab-active' : 'tab-inactive'}}" onclick="changeTab(0)">
+               <text class="{{currentTab === 0 ? 'text-active' : 'text-inactive'}}">步数</text>
+             </div>
+             <div class="tab-btn {{currentTab === 1 ? 'tab-active' : 'tab-inactive'}}" onclick="changeTab(1)">
+               <text class="{{currentTab === 1 ? 'text-active' : 'text-inactive'}}">时长</text>
+             </div>
+             <div class="tab-btn {{currentTab === 2 ? 'tab-active' : 'tab-inactive'}}" onclick="changeTab(2)">
+               <text class="{{currentTab === 2 ? 'text-active' : 'text-inactive'}}">消耗</text>
+             </div>
+           </div>
+
+           <!-- Date Navigator -->
+           <div class="date-nav">
+             <text class="nav-arrow" onclick="prevWeek">&lt;</text>
+             <picker mode="date" value="{{selectedDate}}" onchange="pickDate">
+                <text class="nav-date">{{dateRangeStr}}</text>
+             </picker>
+             <text class="nav-arrow" onclick="nextWeek">&gt;</text>
+           </div>
+           
+           <!-- Summary Stats -->
+           <div class="stats-row" if="{{hasData}}" if="{{hasData}}">
+             <div class="stat-col">
+               <text class="stat-num">{{avgVal}}</text>
+               <text class="stat-label">平均({{unitStr}})</text>
+             </div>
+             <div class="stat-col">
+               <text class="stat-num">{{totalVal}}</text>
+               <text class="stat-label">总计({{unitStr}})</text>
+             </div>
+           </div>
+           
+           <!-- Chart Section -->
+           <!-- Using a lightweight pure CSS/DIV implementation for minimum size (0kb dependency) -->
+           <div class="chart-wrapper">
+              <block if="{{!hasData}}">
+                 <div class="no-data-container">
+                    <image class="no-data-img" src="../../assets/img/tongji-kong.png" resize-mode="contain"></image>
+                    <text class="no-data-text">暂无数据~</text>
+                 </div>
+              </block>
+              
+              <block else>
+                <div class="y-axis-col">
+                  <text class="axis-label">{{yLabels[4]}}</text>
+                  <text class="axis-label">{{yLabels[3]}}</text>
+                  <text class="axis-label">{{yLabels[2]}}</text>
+                  <text class="axis-label">{{yLabels[1]}}</text>
+                  <text class="axis-label">{{yLabels[0]}}</text>
+                  <text class="axis-label">0</text>
+                </div>
+                
+                <div class="chart-area">
+                  <!-- Grid Lines -->
+                  <div class="grid-background">
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line"></div>
+                    <div class="grid-line box-border-bottom"></div>
+                  </div>
+                  
+                  <!-- Bars -->
+                  <div class="bars-row">
+                    <block for="{{chartData}}">
+                        <div class="bar-cluster">
+                          <div class="bar-track">
+                            <div class="bar-fill" style="height: {{$item.percent}}%; background-color: #ff5500;"></div>
+                          </div>
+                          <text class="x-label-date">{{$item.date}}</text>
+                          <text class="x-label-day">{{$item.day}}</text>
+                        </div>
+                    </block>
+                  </div>
+                </div>
+              </block>
+           </div>
+           
+           <!-- Legend -->
+           <div class="legend-row" if="{{hasData}}">
+             <div class="legend-box"></div>
+             <text class="legend-text">2025年11月</text>
+           </div>
+           
+           <div style="height: 200px;"></div>
+        </div>
+      </stack>
+    </div>
+  </div>
+</template>
+
+<script>
+import storage from '@system.storage';
+
+export default {
+  data: {
+    currentTab: 0, // 0: Steps, 1: Duration, 2: Calories
+    unitStr: '步',
+    avgVal: '0',
+    totalVal: '0',
+    yLabels: [],
+    chartData: [],
+    hasData: false, 
+    
+    // Date Logic
+    selectedDate: '', // YYYY-MM-DD for picker value
+    dateRangeStr: '', // "MM月DD日-MM月DD日"
+    currentWeekStart: null, // Date object
+  },
+  onInit() {
+    console.log('Statistics page initialized');
+    
+    // Init Date: default to today (which is usually part of the week to display)
+    const now = new Date();
+    this.updateWeekRange(now);
+
+    // Load data from localStorage
+    this.loadWeekData();
+  },
+  updateWeekRange(dateObj) {
+      // Calculate Monday of the week
+      const day = dateObj.getDay(); // 0 is Sunday
+      const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+      const monday = new Date(dateObj.setDate(diff));
+      this.currentWeekStart = new Date(monday); 
+      
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      
+      // Update Strings
+      this.selectedDate = this.formatDateISO(monday); // Picker value
+      this.dateRangeStr = `${this.formatDateShort(monday)}-${this.formatDateShort(sunday)}`;
+      
+      // Load data for new week
+      this.loadWeekData();
+  },
+  formatDateISO(date) {
+      const y = date.getFullYear();
+      const m = (date.getMonth() + 1).toString().padStart(2, '0');
+      const d = date.getDate().toString().padStart(2, '0');
+      return `${y}-${m}-${d}`;
+  },
+  formatDateShort(date) {
+      const m = date.getMonth() + 1;
+      const d = date.getDate();
+      return `${m}月${d}日`;
+  },
+  getWeekDates() {
+      const dates = [];
+      for (let i = 0; i < 7; i++) {
+          const date = new Date(this.currentWeekStart);
+          date.setDate(date.getDate() + i);
+          dates.push(this.formatDateISO(date));
+      }
+      return dates;
+  },
+  loadWeekData() {
+      const that = this;
+      const weekDates = this.getWeekDates();
+      
+      storage.get({
+          key: 'stepHistory',
+          success: function(data) {
+              if (data) {
+                  const history = JSON.parse(data);
+                  that.processWeekData(history, weekDates);
+              } else {
+                  // No data
+                  that.hasData = false;
+                  that.chartData = [];
+              }
+          },
+          fail: function() {
+              that.hasData = false;
+              that.chartData = [];
+          }
+      });
+  },
+  processWeekData(history, weekDates) {
+      const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+      const chartData = [];
+      let totalValue = 0;
+      let maxValue = 0;
+      
+      // Get current tab type
+      const dataType = this.currentTab; // 0: steps, 1: duration, 2: calories
+      
+      weekDates.forEach((dateStr, index) => {
+          const record = history.find(item => item.date === dateStr);
+          let value = 0;
+          
+          if (record) {
+              if (dataType === 0) {
+                  value = record.steps || 0;
+              } else if (dataType === 1) {
+                  value = record.duration || 0;
+              } else if (dataType === 2) {
+                  value = record.calories || 0;
+              }
+          }
+          
+          totalValue += value;
+          if (value > maxValue) maxValue = value;
+          
+          const date = new Date(dateStr);
+          const dayOfWeek = date.getDay();
+          
+          chartData.push({
+              date: `${date.getMonth() + 1}/${date.getDate()}`,
+              day: dayNames[dayOfWeek],
+              value: value,
+              percent: 0 // Will calculate after we know max
+          });
+      });
+      
+      // Calculate percentages
+      if (maxValue > 0) {
+          chartData.forEach(item => {
+              item.percent = (item.value / maxValue) * 100;
+          });
+      }
+      
+      // Update chart data
+      this.chartData = chartData;
+      this.hasData = totalValue > 0;
+      
+      // Calculate stats
+      if (this.hasData) {
+          const avgValue = Math.round(totalValue / 7);
+          this.avgVal = avgValue.toString();
+          this.totalVal = totalValue.toString();
+          
+          // Update unit string
+          if (dataType === 0) {
+              this.unitStr = '步';
+          } else if (dataType === 1) {
+              this.unitStr = '分钟';
+          } else if (dataType === 2) {
+              this.unitStr = 'kcal';
+          }
+          
+          // Calculate Y-axis labels
+          this.calculateYLabels(maxValue);
+      } else {
+          this.avgVal = '0';
+          this.totalVal = '0';
+      }
+  },
+  calculateYLabels(maxValue) {
+      const step = Math.ceil(maxValue / 5);
+      this.yLabels = [];
+      for (let i = 0; i < 5; i++) {
+          this.yLabels.push((step * (i + 1)).toString());
+      }
+  },
+  pickDate(e) {
+      console.log('Date picked: ' + e.value);
+      const parts = e.value.split('-'); // YYYY-MM-DD
+      const date = new Date(parts[0], parts[1] - 1, parts[2]);
+      this.updateWeekRange(date);
+  },
+  changeTab(index) {
+    if (this.currentTab === index) return;
+    this.currentTab = index;
+    this.loadWeekData();
+  },
+  prevWeek() {
+    console.log('Previous Week');
+    if (this.currentWeekStart) {
+        const prevMonday = new Date(this.currentWeekStart);
+        prevMonday.setDate(prevMonday.getDate() - 7);
+        this.updateWeekRange(prevMonday);
+    }
+  },
+  nextWeek() {
+    console.log('Next Week');
+    if (this.currentWeekStart) {
+        const nextMonday = new Date(this.currentWeekStart);
+        nextMonday.setDate(nextMonday.getDate() + 7);
+        this.updateWeekRange(nextMonday);
+    }
+  }
+}
+</script>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #ffffff;
+}
+.scroll-wrapper {
+  flex: 1;
+  flex-direction: column;
+}
+.top-stack {
+  width: 100%;
+}
+.top-bg {
+  width: 100%;
+  height: 900px;
+}
+.main-content {
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 60px;
+  margin-top: 380px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-top-left-radius: 60px;
+  border-top-right-radius: 60px;
+}
+.header-row {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 80px;
+}
+.page-title {
+  font-size: 56px;
+  font-weight: bold;
+  color: #000000;
+}
+.eye-icon {
+  width: 50px;
+  height: 30px;
+  resize-mode: contain;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+.tabs-row {
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 80px;
+}
+.tab-btn {
+  width: 280px;
+  height: 100px;
+  border-radius: 50px;
+  justify-content: center;
+  align-items: center;
+}
+.tab-active {
+  background-color: #88ff00; /* Bright Green */
+}
+.tab-active-light {
+  background-color: #eaffcc; /* Light Green */
+}
+.tab-inactive {
+  background-color: #eaffcc; /* Light Green */
+}
+.text-active {
+  color: #000000;
+  font-size: 36px;
+  font-weight: bold;
+}
+.text-active-light {
+    color: #4a9e00;
+    font-size: 36px;
+    font-weight: bold;
+}
+.text-inactive {
+  color: #4a9e00;
+  font-size: 36px;
+  font-weight: bold;
+}
+
+/* Date Nav */
+.date-nav {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 60px;
+}
+.nav-arrow {
+  font-size: 40px;
+  font-weight: bold;
+  padding: 10px 20px;
+  color: #000000;
+}
+.nav-date {
+  font-size: 42px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* Stats */
+.stats-row {
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 80px;
+}
+.stat-col {
+  flex-direction: column;
+  align-items: center;
+}
+.stat-num {
+  font-size: 48px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10px;
+}
+.stat-label {
+  font-size: 28px;
+  color: #999999;
+}
+
+/* Chart */
+.chart-wrapper {
+  flex-direction: row;
+  height: 900px;
+  width: 100%;
+}
+.y-axis-col {
+  flex-direction: column;
+  justify-content: space-between;
+  height: 820px; /* Aligned with grid height */
+  width: 60px;
+  padding-bottom: 40px; /* Align 0 with bottom line */
+  margin-top: 10px;
+}
+.axis-label {
+  font-size: 24px;
+  color: #999999;
+  text-align: right;
+  width: 100%;
+}
+.chart-area {
+  flex: 1;
+  height: 100%;
+  flex-direction: stack; 
+  margin-left: 20px;
+  position: relative;
+}
+.grid-background {
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 780px; /* Chart drawing height */
+  position: absolute;
+  top: 20px;
+}
+.grid-line {
+  width: 100%;
+  height: 1px;
+  background-color: #eeeeee;
+  border-bottom-style: dashed; /* Note: quickapp might adhere to specific border styles only on divs */
+}
+.box-border-bottom {
+    border-bottom-width: 1px;
+    border-bottom-color: #cccccc;
+    border-bottom-style: solid;
+}
+.bars-row {
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding-top: 20px; /* match top of grid */
+}
+.bar-cluster {
+  flex-direction: column;
+  align-items: center;
+  width: 60px;
+  height: 100%;
+}
+.bar-track {
+  width: 40px;
+  height: 780px;
+  background-color: #fff9f5; /* Light skin/pink tone */
+  border-radius: 20px;
+  flex-direction: column-reverse; /* Bottom up */
+  align-items: center;
+}
+.bar-fill {
+  width: 40px; /* Matches track width */
+  border-radius: 20px;
+}
+.x-label-date {
+  margin-top: 15px;
+  font-size: 22px;
+  color: #666666;
+  text-align: center;
+}
+.x-label-day {
+  margin-top: 5px;
+  font-size: 22px;
+  color: #666666;
+  text-align: center;
+}
+
+/* Legend */
+.legend-row {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+}
+.legend-box {
+  width: 30px;
+  height: 30px;
+  background-color: #ff5500;
+  margin-right: 15px;
+  border-radius: 6px;
+}
+.legend-text {
+  font-size: 28px;
+  color: #666666;
+}
+
+/* No Data State */
+.no-data-container {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.no-data-img {
+  width: 400px;
+  resize-mode: contain;
+}
+.no-data-text {
+  font-size: 30px;
+  color: #cccccc;
+  margin-top: 30px;
+}
+</style>

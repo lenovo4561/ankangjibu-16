@@ -1,0 +1,51 @@
+{
+  "app": {
+    "name": "安康计步"
+  },
+  "tabs": {
+    "jibu": "计步",
+    "tongji": "统计",
+    "heshui": "喝水",
+    "mine": "我的"
+  },
+  "jibu": {
+    "title": "计步页面",
+    "desc": "这里是计步页面的内容",
+    "steps": "步数",
+    "target": "目标",
+    "completed": "已完成"
+  },
+  "tongji": {
+    "title": "统计页面",
+    "desc": "这里是统计页面的内容",
+    "daily": "今日",
+    "weekly": "本周",
+    "monthly": "本月"
+  },
+  "heshui": {
+    "title": "喝水页面",
+    "desc": "这里是喝水页面的内容",
+    "waterIntake": "饮水量",
+    "target": "目标",
+    "remind": "提醒"
+  },
+  "mine": {
+    "title": "我的页面",
+    "desc": "这里是我的页面的内容",
+    "settings": "设置",
+    "about": "关于",
+    "feedback": "反馈"
+  },
+  "actions": {
+    "confirm": "确定",
+    "cancel": "取消",
+    "save": "保存",
+    "edit": "编辑",
+    "delete": "删除"
+  },
+  "messages": {
+    "success": "操作成功",
+    "failed": "操作失败",
+    "loading": "加载中..."
+  }
+}

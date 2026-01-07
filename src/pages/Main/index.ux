@@ -1,0 +1,126 @@
+<import name="jibu-page" src="./jibu.ux"></import>
+<import name="tongji-page" src="./tongji.ux"></import>
+<import name="heshui-page" src="./heshui.ux"></import>
+<import name="mine-page" src="./mine.ux"></import>
+
+<template>
+  <div class="main-page">
+    <tabs class="tabs" onchange="changeTab" index="{{currentIndex}}">
+      <tab-content class="tab-content">
+        <jibu-page id="jibu-page"></jibu-page>
+        <tongji-page id="tongji-page"></tongji-page>
+        <heshui-page id="heshui-page"></heshui-page>
+        <mine-page id="mine-page"></mine-page>
+      </tab-content>
+    </tabs>
+
+    <div class="tab-bar">
+      <div class="tab-item" onclick="clickTab(0)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 0 ? '../../assets/img/jibu-s.png' : '../../assets/img/jibu-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 0 ? '#FFFFFF' : '#999999'}}"
+          >计步</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(1)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 1 ? '../../assets/img/tongji-s.png' : '../../assets/img/tongji-u-1.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 1 ? '#FFFFFF' : '#999999'}}"
+          >统计</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(2)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 2 ? '../../assets/img/heshui-s.png' : '../../assets/img/heshui-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 2 ? '#FFFFFF' : '#999999'}}"
+          >喝水</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(3)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 3 ? '../../assets/img/mine-s.png' : '../../assets/img/mine-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 3 ? '#FFFFFF' : '#999999'}}"
+          >我的</text
+        >
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  private: {
+    currentIndex: 0
+  },
+  onInit() {
+    console.log('Main page initialized')
+  },
+  changeTab(e) {
+    this.currentIndex = e.index
+  },
+  clickTab(index) {
+    this.currentIndex = index
+  }
+}
+</script>
+
+<style>
+.main-page {
+  flex-direction: column;
+  background-color: #ffffff;
+  height: 100%;
+}
+.tabs {
+  flex: 1;
+}
+.tab-content {
+  flex: 1;
+}
+.tab-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  height: 150px;
+  background-color: #1A1A1A;
+  border-radius: 75px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+.tab-item {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+.tab-icon {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  margin-bottom: 8px;
+}
+.tab-text {
+  font-size: 24px;
+}
+</style>
