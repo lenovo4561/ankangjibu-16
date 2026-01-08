@@ -155,101 +155,101 @@ export default {
   top: 0;
   left: 0;
   width: 100%;
-  height: 800px;
+  height: 185px;
 }
 .navbar {
-  height: 100px;
+  height: 23px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0 30px;
-  margin-top: 60px; /* Status bar spacing */
+  padding: 0 6px;
+  margin-top: 13px; /* Status bar spacing */
   z-index: 10;
 }
 .back-btn {
-  width: 80px;
-  height: 80px;
+  width: 18px;
+  height: 18px;
   justify-content: center;
   align-items: center;
 }
 .back-icon {
-  width: 50px;
-  height: 50px;
+  width: 11px;
+  height: 11px;
   resize-mode: contain;
 }
 .title-img {
-  width: 500px;
-  height: 85px;
+  width: 115px;
+  height: 19px;
   resize-mode: contain;
 }
 .placeholder {
-  width: 80px;
+  width: 18px;
 }
 
 .content {
   flex-direction: column;
-  margin-top: 350px;
-  padding-bottom: 50px;
+  margin-top: 81px;
+  padding-bottom: 11px;
   align-items: center;
 }
 
 .section {
   flex-direction: column;
   align-items: center;
-  margin-bottom: 80px;
+  margin-bottom: 18px;
   width: 100%;
 }
 
 .value-display {
   flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
-  margin-top:50px
+  margin-bottom: 4px;
+  margin-top:11px
 }
 .label-row {
   flex-direction: row;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 .label {
-  font-size: 36px;
+  font-size: 8px;
   color: #000000;
   font-weight: 900;
 }
 .label-img {
-  width: 100px;
-  height: 60px;
+  width: 23px;
+  height: 13px;
   resize-mode: contain;
 }
 .label-eye {
-  width: 50px;
-  height: 50px;
-  margin-left: 5px;
+  width: 11px;
+  height: 11px;
+  margin-left: 1px;
   resize-mode: contain;
 }
 .value-row {
   flex-direction: row;
   align-items: flex-end;
-  margin-top: 10px;
+  margin-top: 2px;
 }
 .value-text {
-  font-size: 100px;
+  font-size: 23px;
   color: #ff5500;
   font-weight: bold;
-  line-height: 100px;
+  line-height: 23px;
 }
 .unit-text {
-  font-size: 40px;
+  font-size: 9px;
   color: #ff5500;
-  margin-bottom: 15px;
-  margin-left: 5px;
+  margin-bottom: 3px;
+  margin-left: 1px;
   font-weight: bold;
 }
 
 /* Ruler Styles */
 .ruler-container {
   width: 100%;
-  height: 250px;
+  height: 57px;
   align-items: center;
   background-color: rgba(136, 255, 0, 0.05); /* Very light green */
 }
@@ -260,12 +260,12 @@ export default {
 }
 
 .pad-item {
-  width: 525px; 
+  width: 121px; 
   height: 100%;
 }
 
 .ruler-item {
-  width: 30px; /* itemWidth */
+  width: 6px; /* itemWidth */
   height: 100%;
   flex-direction: column;
   align-items: center;
@@ -273,21 +273,21 @@ export default {
 }
 
 .line {
-  width: 2px;
+  width: 0px;
   background-color: #88ff00; /* Light green ruler lines */
-  margin-top: 30px;
+  margin-top: 6px;
   flex-shrink: 0;
 }
 .line-long {
-  height: 60px;
+  height: 13px;
   background-color: #55cc00;
 }
 .line-short {
-  height: 35px;
+  height: 8px;
 }
 .ruler-num {
-  margin-top: 10px;
-  font-size: 24px;
+  margin-top: 2px;
+  font-size: 5px;
   color: #55cc00;
 }
 
@@ -298,18 +298,18 @@ export default {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  padding-top: 15px; 
+  padding-top: 3px; 
 }
 .pointer-img {
-  width: 40px;
-  height: 40px;
+  width: 9px;
+  height: 9px;
   resize-mode: contain;
 }
 .pointer-line {
-  width: 2px;
-  height: 100px;
+  width: 0px;
+  height: 23px;
   background-color: #ff5500;
-  margin-top: -2px; /* Connect to triangle */
+  margin-top: 0px; /* Connect to triangle */
 }
 
 /* Button */
@@ -317,33 +317,33 @@ export default {
   width: 100%;
   align-items: center;
   position: fixed;
-  bottom: 80px;
+  bottom: 18px;
   left: 0;
-  padding: 0 140px;
+  padding: 0 32px;
 }
 .confirm-btn {
   width: 100%;
-  height: 130px;
+  height: 30px;
   background-color: #88ff00;
-  border-radius: 65px;
+  border-radius: 15px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
 .btn-text-img {
-  width: 140px;
-  height: 40px;
-  margin-right: 15px;
+  width: 32px;
+  height: 9px;
+  margin-right: 3px;
 }
 .btn-text {
-  font-size: 42px;
+  font-size: 9px;
   color: #000000;
   font-weight: 900;
-  margin-right: 15px;
+  margin-right: 3px;
 }
 .btn-eye {
-  width: 60px;
-  height: 60px;
+  width: 13px;
+  height: 13px;
   resize-mode: contain;
 }
 

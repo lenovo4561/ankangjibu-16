@@ -97,7 +97,7 @@
              <text class="legend-text">{{currentMonth}}</text>
            </div>
            
-           <div style="height: 200px;"></div>
+           <div style="height: 46px;"></div>
         </div>
       </stack>
     </div>
@@ -433,51 +433,51 @@ export default {
 }
 .top-stack {
   width: 100%;
-  height: 3000px;
+  height: 694px;
 }
 .top-bg {
   width: 100%;
-  height: 900px;
+  height: 208px;
   resize-mode: cover;
 }
 .main-content {
   flex-direction: column;
   width: 100%;
-  padding-left: 40px;
-  padding-right: 40px;
-  padding-top: 60px;
-  margin-top: 380px;
+  padding-left: 9px;
+  padding-right: 9px;
+  padding-top: 13px;
+  margin-top: 87px;
   background-color: rgba(255, 255, 255, 0.9);
-  border-top-left-radius: 60px;
-  border-top-right-radius: 60px;
-  min-height: 1500px;
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+  min-height: 347px;
 }
 .header-row {
   flex-direction: row;
   align-items: center;
-  margin-bottom: 80px;
-  padding-top: 10px;
+  margin-bottom: 18px;
+  padding-top: 2px;
 }
 .page-title-img {
-  width: 120px;
-  height: 45px;
+  width: 27px;
+  height: 10px;
   resize-mode: contain;
 }
 .eye-icon {
-  width: 50px;
-  height: 50px;
-  margin-left: 10px;
+  width: 11px;
+  height: 11px;
+  margin-left: 2px;
   resize-mode: contain;
 }
 .tabs-row {
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 80px;
+  margin-bottom: 18px;
 }
 .tab-btn {
-  width: 280px;
-  height: 100px;
-  border-radius: 50px;
+  width: 64px;
+  height: 23px;
+  border-radius: 11px;
   justify-content: center;
   align-items: center;
 }
@@ -492,17 +492,17 @@ export default {
 }
 .text-active {
   color: #000000;
-  font-size: 36px;
+  font-size: 8px;
   font-weight: bold;
 }
 .text-active-light {
     color: #4a9e00;
-    font-size: 36px;
+    font-size: 8px;
     font-weight: bold;
 }
 .text-inactive {
   color: #4a9e00;
-  font-size: 36px;
+  font-size: 8px;
   font-weight: bold;
 }
 
@@ -511,16 +511,16 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  margin-bottom: 60px;
+  margin-bottom: 13px;
 }
 .nav-arrow {
-  font-size: 40px;
+  font-size: 9px;
   font-weight: bold;
-  padding: 10px 20px;
+  padding: 2px 4px;
   color: #000000;
 }
 .nav-date {
-  font-size: 42px;
+  font-size: 9px;
   font-weight: bold;
   color: #000000;
 }
@@ -529,39 +529,39 @@ export default {
 .stats-row {
   flex-direction: row;
   justify-content: space-around;
-  margin-bottom: 80px;
+  margin-bottom: 18px;
 }
 .stat-col {
   flex-direction: column;
   align-items: center;
 }
 .stat-num {
-  font-size: 48px;
+  font-size: 11px;
   font-weight: bold;
   color: #333333;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 .stat-label {
-  font-size: 28px;
+  font-size: 6px;
   color: #999999;
 }
 
 /* Chart */
 .chart-wrapper {
   flex-direction: row;
-  height: 900px;
+  height: 208px;
   width: 100%;
 }
 .y-axis-col {
   flex-direction: column;
   justify-content: space-between;
-  height: 820px; /* Aligned with grid height */
-  width: 60px;
-  padding-bottom: 40px; /* Align 0 with bottom line */
-  margin-top: 10px;
+  height: 189px; /* Aligned with grid height */
+  width: 13px;
+  padding-bottom: 9px; /* Align 0 with bottom line */
+  margin-top: 2px;
 }
 .axis-label {
-  font-size: 24px;
+  font-size: 5px;
   color: #999999;
   text-align: right;
   width: 100%;
@@ -569,25 +569,25 @@ export default {
 .chart-area {
   flex: 1;
   height: 100%;
-  margin-left: 20px;
+  margin-left: 4px;
   position: relative;
 }
 .grid-background {
   flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  height: 780px; /* Chart drawing height */
+  height: 180px; /* Chart drawing height */
   position: absolute;
-  top: 20px;
+  top: 4px;
 }
 .grid-line {
   width: 100%;
-  height: 1px;
+  height: 0px;
   background-color: #eeeeee;
   border-bottom-style: dashed; /* Note: quickapp might adhere to specific border styles only on divs */
 }
 .box-border-bottom {
-    border-bottom-width: 1px;
+    border-bottom-width: 0px;
     border-bottom-color: #cccccc;
     border-bottom-style: solid;
 }
@@ -596,35 +596,35 @@ export default {
   justify-content: space-between;
   width: 100%;
   height: 100%;
-  padding-top: 20px; /* match top of grid */
+  padding-top: 4px; /* match top of grid */
 }
 .bar-cluster {
   flex-direction: column;
   align-items: center;
-  width: 60px;
+  width: 13px;
   height: 100%;
 }
 .bar-track {
-  width: 40px;
-  height: 780px;
+  width: 9px;
+  height: 180px;
   background-color: #fff9f5; /* Light skin/pink tone */
-  border-radius: 20px;
+  border-radius: 4px;
   flex-direction: column-reverse; /* Bottom up */
   align-items: center;
 }
 .bar-fill {
-  width: 40px; /* Matches track width */
-  border-radius: 20px;
+  width: 9px; /* Matches track width */
+  border-radius: 4px;
 }
 .x-label-date {
-  margin-top: 15px;
-  font-size: 22px;
+  margin-top: 3px;
+  font-size: 5px;
   color: #666666;
   text-align: center;
 }
 .x-label-day {
-  margin-top: 5px;
-  font-size: 22px;
+  margin-top: 1px;
+  font-size: 5px;
   color: #666666;
   text-align: center;
 }
@@ -634,17 +634,17 @@ export default {
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 4px;
 }
 .legend-box {
-  width: 30px;
-  height: 30px;
+  width: 6px;
+  height: 6px;
   background-color: #ff5500;
-  margin-right: 15px;
-  border-radius: 6px;
+  margin-right: 3px;
+  border-radius: 1px;
 }
 .legend-text {
-  font-size: 28px;
+  font-size: 6px;
   color: #666666;
 }
 
@@ -657,13 +657,13 @@ export default {
   height: 100%;
 }
 .no-data-img {
-  width: 400px;
-  height: 400px;
+  width: 92px;
+  height: 92px;
   resize-mode: contain;
 }
 .no-data-text {
-  font-size: 30px;
+  font-size: 6px;
   color: #cccccc;
-  margin-top: 30px;
+  margin-top: 6px;
 }
 </style>

@@ -25,7 +25,13 @@
       "name": "system.storage"
     },
     {
+      "name": "system.device"
+    },
+    {
       "name": "system.webview"
+    },
+    {
+      "name": "system.request"
     }
   ],
   "permissions": [
@@ -35,8 +41,8 @@
   ],
   "template/official": "demo-template",
   "config": {
-    "logLevel": "debug",
-    "designWidth": 1080
+    "logLevel": "off",
+    "designWidth": 250
   },
   "router": {
     "entry": "pages/Splash",
@@ -61,6 +67,12 @@
       }
     }
   },
+  "subpackages": [
+    {
+      "name": "pages",
+      "resource": "pages"
+    }
+  ],
   "display": {
     "titleBarBackgroundColor": "#f2f2f2",
     "titleBarTextColor": "#414141",

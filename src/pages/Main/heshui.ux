@@ -75,7 +75,7 @@
            </div>
            
            <!-- Bottom Padding -->
-           <div style="height: 150px;"></div>
+           <div style="height: 34px;"></div>
         </div>
 
         <!-- Modal -->
@@ -331,116 +331,116 @@ export default {
 }
 .top-bg {
   width: 100%;
-  height: 900px;
+  height: 208px;
 }
 .cartoon-layer {
   width: 100%;
   justify-content: flex-end; /* Align right */
-  padding-right: 30px;
-  padding-top: 60px; 
+  padding-right: 6px;
+  padding-top: 13px; 
 }
 .cartoon-img {
-  width: 600px;
-  height: 700px; 
+  width: 138px;
+  height: 162px; 
 }
 
 .main-content {
   flex-direction: column;
   width: 100%;
-  margin-top: 380px;
+  margin-top: 87px;
   background-color: rgba(255, 255, 255, 0.9);
-  border-top-left-radius: 60px;
-  border-top-right-radius: 60px;
-  padding: 40px;
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+  padding: 9px;
 }
 
 .tips-row {
   flex-direction: row;
-  margin-bottom: 40px;
+  margin-bottom: 9px;
 }
 .tips-tag {
   background-color: #ffe4d6;
-  padding: 10px 30px;
-  border-top-left-radius: 30px;
-  border-top-right-radius: 30px; 
-  border-bottom-right-radius: 30px;
+  padding: 2px 6px;
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px; 
+  border-bottom-right-radius: 6px;
   /* Visual check: label is rounded pill or tag? Screenshot looks like simple pill. */
-  border-radius: 30px;
+  border-radius: 6px;
 }
 .tips-text {
   color: #ff6600;
-  font-size: 28px;
+  font-size: 6px;
   font-weight: bold;
 }
 
 .info-section {
   flex-direction: column;
-  margin-bottom: 60px;
+  margin-bottom: 13px;
 }
 .title-row {
   flex-direction: row;
   align-items: center;
-  margin-top: 20px;
-  margin-bottom: 50px;
+  margin-top: 4px;
+  margin-bottom: 11px;
 }
 .cup-title {
-  font-size: 48px;
+  font-size: 11px;
   font-weight: 900;
   color: #000000;
 }
 .eye-icon-title {
-  width: 50px;
-  height: 30px;
-  margin-left: 10px;
-  margin-right: 40px;
+  width: 11px;
+  height: 6px;
+  margin-left: 2px;
+  margin-right: 9px;
   resize-mode: contain;
 }
 .time-text {
-  font-size: 48px;
+  font-size: 11px;
   font-weight: 900;
   color: #000000;
 }
 .desc-text {
-  font-size: 30px;
+  font-size: 6px;
   color: #333333;
-  line-height: 48px;
+  line-height: 11px;
 }
 
 .hero-box {
   width: 100%;
   align-items: center;
   justify-content: center;
-  margin-top: 20px;
-  margin-bottom: 60px;
+  margin-top: 4px;
+  margin-bottom: 13px;
 }
 .hero-img {
-  width: 750px; 
-  height: 750px;
+  width: 173px; 
+  height: 173px;
 }
 
 .cups-row {
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 60px;
+  margin-bottom: 13px;
 }
 .cup-item {
   flex-direction: column;
   align-items: center;
 }
 .cup-icon-wrapper {
-  width: 90px;
-  height: 90px;
+  width: 20px;
+  height: 20px;
   background-color: transparent;
   justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 .cup-icon {
-  width: 90px; 
-  height: 90px;
+  width: 20px; 
+  height: 20px;
 }
 .cup-label {
-  font-size: 24px;
+  font-size: 5px;
 }
 .label-active {
   color: #000000;
@@ -450,20 +450,20 @@ export default {
   color: #cccccc;
 }
 .label-amount {
-  font-size: 24px;
+  font-size: 5px;
   color: #00ccff; /* Cyan color for water amount */
   font-weight: bold;
-  margin-top: 5px;
+  margin-top: 1px;
 }
 .label-time {
-  font-size: 20px;
+  font-size: 4px;
   color: #999999;
-  margin-top: 2px;
+  margin-top: 0px;
 }
 .label-gray {
-  font-size: 20px;
+  font-size: 4px;
   color: #cccccc;
-  margin-top: 2px;
+  margin-top: 0px;
 }
 
 .action-area {
@@ -472,22 +472,22 @@ export default {
 }
 .action-btn {
   width: 100%;
-  height: 130px;
+  height: 30px;
   background-color: #88ff00;
-  border-radius: 65px;
+  border-radius: 15px;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
 .btn-text {
-  font-size: 44px;
+  font-size: 10px;
   font-weight: 900;
   color: #000000;
-  margin-right: 15px;
+  margin-right: 3px;
 }
 .btn-eye {
-  width: 60px;
-  height: 36px;
+  width: 13px;
+  height: 8px;
   resize-mode: contain;
 }
 
@@ -503,65 +503,65 @@ export default {
   align-items: center;
 }
 .modal-wrapper {
-  width: 600px;
+  width: 138px;
   background-color: #ffffff;
-  border-radius: 40px;
+  border-radius: 9px;
   flex-direction: column;
   overflow: hidden;
 }
 .modal-header {
   width: 100%;
-  height: 150px;
+  height: 34px;
   background: linear-gradient(to bottom, #ffcca6, #ffffff);
   justify-content: center;
   align-items: center;
 }
 .modal-title {
-  font-size: 40px;
+  font-size: 9px;
   font-weight: 900;
   color: #000000;
-  margin-top: 20px;
+  margin-top: 4px;
 }
 .modal-body {
-  padding: 40px;
+  padding: 9px;
   flex-direction: column;
 }
 .input-label {
-  font-size: 30px;
+  font-size: 6px;
   color: #333333;
-  margin-bottom: 20px;
+  margin-bottom: 4px;
   font-weight: bold;
 }
 .input-box {
   width: 100%;
-  height: 100px;
+  height: 23px;
   background-color: #f7f7f7;
-  border-radius: 20px;
-  padding: 0 30px;
-  font-size: 30px;
+  border-radius: 4px;
+  padding: 0 6px;
+  font-size: 6px;
   color: #333333;
 }
 .modal-footer {
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 40px 40px 40px;
+  padding: 0 9px 9px 9px;
 }
 .modal-btn {
-  width: 240px;
-  height: 90px;
-  border-radius: 45px;
+  width: 55px;
+  height: 20px;
+  border-radius: 10px;
   justify-content: center;
   align-items: center;
 }
 .cancel-btn {
   background-color: #ffffff;
-  border: 1px solid #000000;
+  border: 0px solid #000000;
 }
 .confirm-btn {
   background-color: #88ff00;
 }
 .modal-btn-text {
-  font-size: 32px;
+  font-size: 7px;
   font-weight: bold;
   color: #000000;
 }
