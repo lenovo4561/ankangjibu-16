@@ -105,15 +105,17 @@
 </template>
 
 <script>
+import storage from '@system.storage';
+
 export default {
   data: {
     showModal: false,
     inputAmount: '',
-    currentIndex: 4,
+    currentIndex: 0,
     currentCup: {
-      title: '第5杯水',
-      time: '15:00左右',
-      desc: '下午3点是人体新陈代谢的小高峰，也是极易出现"下午茶困"的时段。此时饮用200ml左右温水，能快速为身体补充消耗的水分，促进代谢废物排出，帮助大脑维持清醒状态。相比咖啡、浓茶等刺激性饮品，温水不会给心脏和肾脏带来额外负担，是更健康的提神选择。'
+      title: '第1杯水',
+      time: '起床后30分钟内',
+      desc: '经过一夜睡眠，身体通过呼吸、皮肤蒸发流失大量水分，处于生理性缺水状态。此时饮用200-300ml温水，能迅速补充体液，稀释血液黏稠度，降低血栓形成风险。同时，温水可温和唤醒肠胃功能，刺激肠道蠕动，帮助排出宿便，为新一天的新陈代谢扫清障碍。切记避开冰水，以免刺激肠胃黏膜引发痉挛或不适。'
     },
     cupConfig: [
       {
@@ -159,12 +161,11 @@ export default {
     ],
     cupList: [
       // Status: 'done' | 'current' | 'locked'
-      // Mock data for demo: first 4 done, 5th current, rest locked
-      { status: 'done', amount: 400, drinkTime: '07:30' }, 
-      { status: 'done', amount: 400, drinkTime: '09:28' }, 
-      { status: 'done', amount: 400, drinkTime: '11:31' }, 
-      { status: 'done', amount: 400, drinkTime: '13:28' }, 
-      { status: 'current', amount: 0, drinkTime: '' }, // The active one
+      { status: 'current', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
       { status: 'locked', amount: 0, drinkTime: '' },
       { status: 'locked', amount: 0, drinkTime: '' },
       { status: 'locked', amount: 0, drinkTime: '' }
@@ -172,7 +173,70 @@ export default {
   },
   onInit() {
     console.log('Drink Water Page Init');
+    this.loadWaterData();
     this.updateCurrentCup();
+  },
+  getTodayDate() {
+    const date = new Date();
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+  },
+  loadWaterData() {
+    const that = this;
+    const today = that.getTodayDate();
+    
+    storage.get({
+      key: 'waterData',
+      success: function(data) {
+        if (data) {
+          const waterData = JSON.parse(data);
+          
+          // 检查是否是今天的数据
+          if (waterData.date === today) {
+            // 恢复今天的喝水记录
+            that.cupList = waterData.cupList || that.cupList;
+            that.currentIndex = waterData.currentIndex || 0;
+            that.updateCurrentCup();
+          } else {
+            // 新的一天，清空数据
+            that.resetWaterData();
+          }
+        }
+      },
+      fail: function() {
+        console.log('No previous water data found');
+      }
+    });
+  },
+  resetWaterData() {
+    // 重置为初始状态
+    this.cupList = [
+      { status: 'current', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' },
+      { status: 'locked', amount: 0, drinkTime: '' }
+    ];
+    this.currentIndex = 0;
+    this.updateCurrentCup();
+  },
+  saveWaterData() {
+    const today = this.getTodayDate();
+    const waterData = {
+      date: today,
+      cupList: this.cupList,
+      currentIndex: this.currentIndex
+    };
+    
+    storage.set({
+      key: 'waterData',
+      value: JSON.stringify(waterData),
+      success: function() {
+        console.log('Water data saved successfully');
+      }
+    });
   },
   updateCurrentCup() {
       // Find the first 'current' cup or the last one if all done
@@ -234,6 +298,9 @@ export default {
       
       // Update info card to next cup
       this.updateCurrentCup();
+      
+      // Save to localStorage
+      this.saveWaterData();
       
       // Close modal and clear input
       this.showModal = false;

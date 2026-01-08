@@ -1,0 +1,350 @@
+<import name="scale-ruler" src="./ScaleRuler.ux"></import>
+
+<template>
+  <div class="page">
+    <!-- Top Background -->
+    <image class="top-bg" src="../../assets/img/bg_.png" resize-mode="contain"></image>
+    
+    <!-- Navbar -->
+    <div class="navbar">
+      <div class="back-btn" onclick="goBack">
+        <image class="back-icon" src="../../assets/img/back.png"></image>
+      </div>
+      <image class="title-img" src="../../assets/img/sgtz.png"></image>
+      <div class="placeholder"></div>
+    </div>
+
+    <div class="content">
+      <!-- Height Section -->
+      <div class="section">
+        <div class="value-display">
+          <div class="label-row">
+             <image class="label-img" src="../../assets/img/sg.png"></image>
+             <image class="label-eye" src="../../assets/img/yanjing.png"></image>
+          </div>
+          <div class="value-row">
+            <text class="value-text">{{currentHeight}}</text>
+            <text class="unit-text">cm</text>
+          </div>
+        </div>
+        
+        <!-- Height Ruler Component -->
+        <scale-ruler 
+          min="{{minHeight}}" 
+          max="{{maxHeight}}" 
+          value="{{currentHeight}}" 
+          unit-text="cm"
+          onchange="onHeightChange">
+        </scale-ruler>
+      </div>
+
+      <!-- Weight Section -->
+      <div class="section">
+        <div class="value-display">
+          <div class="label-row">
+             <image class="label-img" src="../../assets/img/tz.png"></image>
+             <image class="label-eye" src="../../assets/img/yanjing.png"></image>
+          </div>
+          <div class="value-row">
+             <text class="value-text">{{currentWeight}}</text>
+             <text class="unit-text">kg</text>
+          </div>
+        </div>
+        
+        <!-- Weight Ruler Component -->
+        <scale-ruler 
+          min="{{minWeight}}" 
+          max="{{maxWeight}}" 
+          value="{{currentWeight}}" 
+          unit-text="kg"
+          onchange="onWeightChange">
+        </scale-ruler>
+      </div>
+      
+      <!-- Confirm Button -->
+      <div class="btn-container">
+        <div class="confirm-btn" onclick="saveData">
+          <image class="btn-text-img" src="../../assets/img/qd.png" resize-mode="contain"></image>
+          <image class="btn-eye" src="../../assets/img/yanjing2_.png"></image>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from '@system.router';
+import storage from '@system.storage';
+
+export default {
+  data: {
+    currentHeight: 170,
+    currentWeight: 60,
+    
+    minHeight: 150,
+    maxHeight: 250,
+    minWeight: 30,
+    maxWeight: 150
+  },
+  onInit() {
+    this.loadData();
+  },
+  onReady() {
+    // Component handles its own scroll init
+  },
+  loadData() {
+    const that = this;
+    storage.get({
+        key: 'bmiData',
+        success: function(data) {
+            if (data) {
+                const bmiData = JSON.parse(data);
+                if (bmiData.bmiHeight) that.currentHeight = parseInt(bmiData.bmiHeight);
+                if (bmiData.bmiWeight) that.currentWeight = parseInt(bmiData.bmiWeight);
+                console.info("Loaded BMI data:", that.currentHeight, that.currentWeight);
+            }
+        }
+    });
+  },
+  goBack() {
+    router.back();
+  },
+  onHeightChange(e) {
+      if (e.detail && e.detail.value) {
+          this.currentHeight = e.detail.value;
+      }
+  },
+  onWeightChange(e) {
+      if (e.detail && e.detail.value) {
+          this.currentWeight = e.detail.value;
+      }
+  },
+  saveData() {
+      // Calculate BMI
+      const h_m = this.currentHeight / 100;
+      const bmi = this.currentWeight / (h_m * h_m);
+      const bmiValue = parseFloat(bmi.toFixed(1));
+      
+      const bmiData = {
+        bmiHeight: this.currentHeight,
+        bmiWeight: this.currentWeight,
+        bmiValue: bmiValue,
+        hasBmiData: true
+      };
+      
+      const that = this;
+      storage.set({
+        key: 'bmiData',
+        value: JSON.stringify(bmiData),
+        success: function() {
+            that.goBack();
+        }
+      });
+  }
+}
+</script>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #f8ffff;
+  position: relative;
+}
+.top-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 800px;
+}
+.navbar {
+  height: 100px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 30px;
+  margin-top: 60px; /* Status bar spacing */
+  z-index: 10;
+}
+.back-btn {
+  width: 80px;
+  height: 80px;
+  justify-content: center;
+  align-items: center;
+}
+.back-icon {
+  width: 50px;
+  height: 50px;
+  resize-mode: contain;
+}
+.title-img {
+  width: 500px;
+  height: 85px;
+  resize-mode: contain;
+}
+.placeholder {
+  width: 80px;
+}
+
+.content {
+  flex-direction: column;
+  margin-top: 350px;
+  padding-bottom: 50px;
+  align-items: center;
+}
+
+.section {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 80px;
+  width: 100%;
+}
+
+.value-display {
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+  margin-top:50px
+}
+.label-row {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.label {
+  font-size: 36px;
+  color: #000000;
+  font-weight: 900;
+}
+.label-img {
+  width: 100px;
+  height: 60px;
+  resize-mode: contain;
+}
+.label-eye {
+  width: 50px;
+  height: 50px;
+  margin-left: 5px;
+  resize-mode: contain;
+}
+.value-row {
+  flex-direction: row;
+  align-items: flex-end;
+  margin-top: 10px;
+}
+.value-text {
+  font-size: 100px;
+  color: #ff5500;
+  font-weight: bold;
+  line-height: 100px;
+}
+.unit-text {
+  font-size: 40px;
+  color: #ff5500;
+  margin-bottom: 15px;
+  margin-left: 5px;
+  font-weight: bold;
+}
+
+/* Ruler Styles */
+.ruler-container {
+  width: 100%;
+  height: 250px;
+  align-items: center;
+  background-color: rgba(136, 255, 0, 0.05); /* Very light green */
+}
+.ruler-list {
+  width: 100%;
+  height: 100%;
+  flex-direction: row;
+}
+
+.pad-item {
+  width: 525px; 
+  height: 100%;
+}
+
+.ruler-item {
+  width: 30px; /* itemWidth */
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.line {
+  width: 2px;
+  background-color: #88ff00; /* Light green ruler lines */
+  margin-top: 30px;
+  flex-shrink: 0;
+}
+.line-long {
+  height: 60px;
+  background-color: #55cc00;
+}
+.line-short {
+  height: 35px;
+}
+.ruler-num {
+  margin-top: 10px;
+  font-size: 24px;
+  color: #55cc00;
+}
+
+/* Pointer */
+.pointer-wrapper {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding-top: 15px; 
+}
+.pointer-img {
+  width: 40px;
+  height: 40px;
+  resize-mode: contain;
+}
+.pointer-line {
+  width: 2px;
+  height: 100px;
+  background-color: #ff5500;
+  margin-top: -2px; /* Connect to triangle */
+}
+
+/* Button */
+.btn-container {
+  width: 100%;
+  align-items: center;
+  position: fixed;
+  bottom: 80px;
+  left: 0;
+  padding: 0 140px;
+}
+.confirm-btn {
+  width: 100%;
+  height: 130px;
+  background-color: #88ff00;
+  border-radius: 65px;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.btn-text-img {
+  width: 140px;
+  height: 40px;
+  margin-right: 15px;
+}
+.btn-text {
+  font-size: 42px;
+  color: #000000;
+  font-weight: 900;
+  margin-right: 15px;
+}
+.btn-eye {
+  width: 60px;
+  height: 60px;
+  resize-mode: contain;
+}
+
+</style>

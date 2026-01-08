@@ -3,13 +3,13 @@
     <div class="scroll-wrapper">
       <stack class="top-stack">
         <!-- Background Image -->
-        <image class="top-bg" src="../../assets/img/shouyedingbg.png" resize-mode="cover"></image>
+        <image class="top-bg" src="../../assets/img/shouyedingbg.png"></image>
         
         <div class="main-content">
            <!-- Header -->
            <div class="header-row">
-             <text class="page-title">统计</text>
-             <image class="eye-icon" src="../../assets/img/yanjing.png"></image>
+             <image class="page-title-img" src="/assets/img/tj.png"></image>
+             <image class="eye-icon" src="/assets/img/yanjing.png"></image>
            </div>
            
            <!-- Tabs (Steps, Duration, Consumption) -->
@@ -28,14 +28,12 @@
            <!-- Date Navigator -->
            <div class="date-nav">
              <text class="nav-arrow" onclick="prevWeek">&lt;</text>
-             <picker mode="date" value="{{selectedDate}}" onchange="pickDate">
-                <text class="nav-date">{{dateRangeStr}}</text>
-             </picker>
+             <text class="nav-date">{{dateRangeStr}}</text>
              <text class="nav-arrow" onclick="nextWeek">&gt;</text>
            </div>
            
            <!-- Summary Stats -->
-           <div class="stats-row" if="{{hasData}}" if="{{hasData}}">
+           <div class="stats-row" if="{{hasData}}">
              <div class="stat-col">
                <text class="stat-num">{{avgVal}}</text>
                <text class="stat-label">平均({{unitStr}})</text>
@@ -51,7 +49,7 @@
            <div class="chart-wrapper">
               <block if="{{!hasData}}">
                  <div class="no-data-container">
-                    <image class="no-data-img" src="../../assets/img/tongji-kong.png" resize-mode="contain"></image>
+                    <image class="no-data-img" src="../../assets/img/tongji-kong.png"></image>
                     <text class="no-data-text">暂无数据~</text>
                  </div>
               </block>
@@ -66,7 +64,7 @@
                   <text class="axis-label">0</text>
                 </div>
                 
-                <div class="chart-area">
+                <stack class="chart-area">
                   <!-- Grid Lines -->
                   <div class="grid-background">
                     <div class="grid-line"></div>
@@ -89,14 +87,14 @@
                         </div>
                     </block>
                   </div>
-                </div>
+                </stack>
               </block>
            </div>
            
            <!-- Legend -->
            <div class="legend-row" if="{{hasData}}">
              <div class="legend-box"></div>
-             <text class="legend-text">2025年11月</text>
+             <text class="legend-text">{{currentMonth}}</text>
            </div>
            
            <div style="height: 200px;"></div>
@@ -123,6 +121,7 @@ export default {
     selectedDate: '', // YYYY-MM-DD for picker value
     dateRangeStr: '', // "MM月DD日-MM月DD日"
     currentWeekStart: null, // Date object
+    currentMonth: '', // "YYYY年MM月" for legend
   },
   onInit() {
     console.log('Statistics page initialized');
@@ -134,11 +133,25 @@ export default {
     // Load data from localStorage
     this.loadWeekData();
   },
+  onShow() {
+    console.log('Statistics page onShow - reloading data');
+    // 确保 currentWeekStart 已初始化，如果未初始化则使用当前日期
+    if (!this.currentWeekStart) {
+      const now = new Date();
+      this.updateWeekRange(now);
+    } else {
+      // 每次页面显示时重新加载数据，确保显示最新的统计数据
+      this.loadWeekData();
+    }
+  },
   updateWeekRange(dateObj) {
       // Calculate Monday of the week
-      const day = dateObj.getDay(); // 0 is Sunday
-      const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
-      const monday = new Date(dateObj.setDate(diff));
+      // 创建新的 Date 对象，避免修改原始对象
+      const tempDate = new Date(dateObj.getTime());
+      const day = tempDate.getDay(); // 0 is Sunday
+      const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+      tempDate.setDate(diff);
+      const monday = new Date(tempDate);
       this.currentWeekStart = new Date(monday); 
       
       const sunday = new Date(monday);
@@ -147,6 +160,11 @@ export default {
       // Update Strings
       this.selectedDate = this.formatDateISO(monday); // Picker value
       this.dateRangeStr = `${this.formatDateShort(monday)}-${this.formatDateShort(sunday)}`;
+      
+      // Update current month for legend
+      const year = monday.getFullYear();
+      const month = monday.getMonth() + 1;
+      this.currentMonth = `${year}年${month}月`;
       
       // Load data for new week
       this.loadWeekData();
@@ -164,6 +182,14 @@ export default {
   },
   getWeekDates() {
       const dates = [];
+      // 如果 currentWeekStart 未初始化，使用当前日期计算本周
+      if (!this.currentWeekStart) {
+          const now = new Date();
+          const day = now.getDay();
+          const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+          now.setDate(diff);
+          this.currentWeekStart = new Date(now);
+      }
       for (let i = 0; i < 7; i++) {
           const date = new Date(this.currentWeekStart);
           date.setDate(date.getDate() + i);
@@ -174,22 +200,114 @@ export default {
   loadWeekData() {
       const that = this;
       const weekDates = this.getWeekDates();
+      console.log('Loading week data, weekDates:', JSON.stringify(weekDates));
       
       storage.get({
           key: 'stepHistory',
           success: function(data) {
-              if (data) {
-                  const history = JSON.parse(data);
-                  that.processWeekData(history, weekDates);
+              console.log('stepHistory data:', data);
+          let history = [];
+          if (data) {
+            try {
+              const parsed = JSON.parse(data);
+              if (Array.isArray(parsed)) {
+                history = parsed;
               } else {
-                  // No data
-                  that.hasData = false;
-                  that.chartData = [];
+                console.log('stepHistory is not an array, ignoring');
               }
+            } catch (e) {
+              console.log('Failed to parse stepHistory, ignoring:', e);
+            }
+          }
+
+          // If stepHistory is empty/missing, fallback to stepData (today) so the stats page can still show data.
+          storage.get({
+            key: 'stepData',
+            success: function(stepDataStr) {
+              let stepData = null;
+              if (stepDataStr) {
+                try {
+                  stepData = JSON.parse(stepDataStr);
+                } catch (e) {
+                  console.log('Failed to parse stepData:', e);
+                }
+              }
+
+              if (stepData && stepData.date) {
+                const inCurrentWeek = weekDates.indexOf(stepData.date) >= 0;
+                if (inCurrentWeek) {
+                  const upsertIndex = history.findIndex(item => item && item.date === stepData.date);
+                  const mergedRecord = {
+                    date: stepData.date,
+                    steps: stepData.totalSteps || stepData.steps || 0,
+                    duration: stepData.totalDuration || stepData.duration || 0,
+                    calories: stepData.totalCalories || stepData.calories || 0,
+                    distance: stepData.totalDistance || stepData.distance || 0
+                  };
+                  if (upsertIndex >= 0) {
+                    history[upsertIndex] = mergedRecord;
+                  } else {
+                    history.push(mergedRecord);
+                  }
+                }
+              }
+
+              if (history.length > 0) {
+                console.log('Using history records:', history.length);
+                that.processWeekData(history, weekDates);
+              } else {
+                console.log('No stepHistory/stepData found');
+                that.hasData = false;
+                that.chartData = [];
+              }
+            },
+            fail: function() {
+              if (history.length > 0) {
+                that.processWeekData(history, weekDates);
+              } else {
+                console.log('No stepHistory and failed to load stepData');
+                that.hasData = false;
+                that.chartData = [];
+              }
+            }
+          });
           },
-          fail: function() {
+          fail: function(err) {
+              console.log('Failed to load stepHistory:', err);
+          // Fallback to stepData
+          storage.get({
+            key: 'stepData',
+            success: function(stepDataStr) {
+              if (!stepDataStr) {
+                that.hasData = false;
+                that.chartData = [];
+                return;
+              }
+              try {
+                const stepData = JSON.parse(stepDataStr);
+                if (stepData && stepData.date) {
+                  that.processWeekData([
+                    {
+                      date: stepData.date,
+                      steps: stepData.totalSteps || stepData.steps || 0,
+                      duration: stepData.totalDuration || stepData.duration || 0,
+                      calories: stepData.totalCalories || stepData.calories || 0,
+                      distance: stepData.totalDistance || stepData.distance || 0
+                    }
+                  ], weekDates);
+                  return;
+                }
+              } catch (e) {
+                console.log('Failed to parse stepData:', e);
+              }
               that.hasData = false;
               that.chartData = [];
+            },
+            fail: function() {
+              that.hasData = false;
+              that.chartData = [];
+            }
+          });
           }
       });
   },
@@ -201,6 +319,17 @@ export default {
       
       // Get current tab type
       const dataType = this.currentTab; // 0: steps, 1: duration, 2: calories
+
+      const toNumber = v => {
+        const n = parseFloat(v);
+        return Number.isFinite(n) ? n : 0;
+      };
+      
+      // 解析日期字符串，避免时区问题
+      const parseLocalDate = (dateStr) => {
+        const parts = dateStr.split('-');
+        return new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+      };
       
       weekDates.forEach((dateStr, index) => {
           const record = history.find(item => item.date === dateStr);
@@ -208,18 +337,18 @@ export default {
           
           if (record) {
               if (dataType === 0) {
-                  value = record.steps || 0;
+            value = toNumber(record.steps || record.totalSteps || record.step || 0);
               } else if (dataType === 1) {
-                  value = record.duration || 0;
+            value = toNumber(record.duration || record.totalDuration || record.time || 0);
               } else if (dataType === 2) {
-                  value = record.calories || 0;
+            value = toNumber(record.calories || record.totalCalories || record.kcal || 0);
               }
           }
           
           totalValue += value;
           if (value > maxValue) maxValue = value;
           
-          const date = new Date(dateStr);
+          const date = parseLocalDate(dateStr);
           const dayOfWeek = date.getDay();
           
           chartData.push({
@@ -270,12 +399,6 @@ export default {
           this.yLabels.push((step * (i + 1)).toString());
       }
   },
-  pickDate(e) {
-      console.log('Date picked: ' + e.value);
-      const parts = e.value.split('-'); // YYYY-MM-DD
-      const date = new Date(parts[0], parts[1] - 1, parts[2]);
-      this.updateWeekRange(date);
-  },
   changeTab(index) {
     if (this.currentTab === index) return;
     this.currentTab = index;
@@ -306,20 +429,20 @@ export default {
   background-color: #ffffff;
 }
 .scroll-wrapper {
-  flex: 1;
   flex-direction: column;
 }
 .top-stack {
   width: 100%;
+  height: 3000px;
 }
 .top-bg {
   width: 100%;
   height: 900px;
+  resize-mode: cover;
 }
 .main-content {
   flex-direction: column;
   width: 100%;
-  height: 100%;
   padding-left: 40px;
   padding-right: 40px;
   padding-top: 60px;
@@ -327,23 +450,24 @@ export default {
   background-color: rgba(255, 255, 255, 0.9);
   border-top-left-radius: 60px;
   border-top-right-radius: 60px;
+  min-height: 1500px;
 }
 .header-row {
   flex-direction: row;
   align-items: center;
   margin-bottom: 80px;
+  padding-top: 10px;
 }
-.page-title {
-  font-size: 56px;
-  font-weight: bold;
-  color: #000000;
+.page-title-img {
+  width: 120px;
+  height: 45px;
+  resize-mode: contain;
 }
 .eye-icon {
   width: 50px;
-  height: 30px;
-  resize-mode: contain;
+  height: 50px;
   margin-left: 10px;
-  margin-top: 5px;
+  resize-mode: contain;
 }
 .tabs-row {
   flex-direction: row;
@@ -445,7 +569,6 @@ export default {
 .chart-area {
   flex: 1;
   height: 100%;
-  flex-direction: stack; 
   margin-left: 20px;
   position: relative;
 }
@@ -535,6 +658,7 @@ export default {
 }
 .no-data-img {
   width: 400px;
+  height: 400px;
   resize-mode: contain;
 }
 .no-data-text {

@@ -47,6 +47,9 @@
       "pages/Web": {
         "component": "index"
       },
+      "pages/BmiSetting": {
+        "component": "index"
+      },
       "pages/Main": {
         "component": "index"
       },
@@ -74,6 +77,13 @@
       "pages/Main": {
         "titleBar": false,
         "menu": false
+      },
+      "pages/BmiSetting": {
+        "titleBar": false,
+        "statusBar": {
+          "immersive": true,
+          "textStyle": "dark"
+        }
       },
       "pages/Demo": {
         "titleBarText": "快应用示例模版",

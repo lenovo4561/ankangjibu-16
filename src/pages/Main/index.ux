@@ -71,11 +71,41 @@ export default {
   onInit() {
     console.log('Main page initialized')
   },
+  onShow() {
+    // 页面显示时，通知当前 Tab 刷新数据
+    this.notifyCurrentTab();
+  },
   changeTab(e) {
-    this.currentIndex = e.index
+    this.currentIndex = e.index;
+    // Tab 切换时，通知新的 Tab 刷新数据
+    this.notifyCurrentTab();
   },
   clickTab(index) {
-    this.currentIndex = index
+    this.currentIndex = index;
+    // Tab 点击切换时，通知新的 Tab 刷新数据
+    this.notifyCurrentTab();
+  },
+  notifyCurrentTab() {
+    const that = this;
+    // 延迟执行，确保 Tab 切换完成
+    setTimeout(function() {
+      if (that.currentIndex === 0) {
+        const jibuPage = that.$child('jibu-page');
+        if (jibuPage && jibuPage.loadData) {
+          jibuPage.loadData();
+        }
+      } else if (that.currentIndex === 1) {
+        const tongjiPage = that.$child('tongji-page');
+        if (tongjiPage && tongjiPage.loadWeekData) {
+          tongjiPage.loadWeekData();
+        }
+      } else if (that.currentIndex === 2) {
+        const heshuiPage = that.$child('heshui-page');
+        if (heshuiPage && heshuiPage.loadData) {
+          heshuiPage.loadData();
+        }
+      }
+    }, 100);
   }
 }
 </script>
