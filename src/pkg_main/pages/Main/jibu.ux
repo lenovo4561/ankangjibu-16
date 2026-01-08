@@ -1,0 +1,966 @@
+<template>
+  <div class="page">
+    <div class="scroll-wrapper">
+      <!-- Top Section -->
+      <stack class="top-section">
+        <image
+          class="top-bg"
+          src="/pkg_main/assets/img/shouyedingbg.png"
+        ></image>
+        <div class="top-content">
+          <!-- Header: Today's Steps + Eye -->
+          <div class="header-row">
+            <image
+              class="title-img"
+              src="/pkg_main/assets/img/jrbs.png"
+            ></image>
+            <image
+              class="eye-icon"
+              src="/pkg_main/assets/img/yanjing.png"
+            ></image>
+          </div>
+
+          <!-- Circular Progress -->
+          <stack class="circle-container">
+            <div class="circle-backdrop"></div>
+            <image
+              class="circle-bg"
+              src="/pkg_main/assets/img/yuanquan.png"
+            ></image>
+            <div class="circle-content">
+              <text class="circle-label">今日步数</text>
+              <div class="step-num-box">
+                <text class="step-num">{{ totalSteps }}</text>
+                <text class="step-unit">步</text>
+              </div>
+              <text class="circle-target">10000</text>
+            </div>
+          </stack>
+
+          <!-- Get Steps Button -->
+          <div class="green-btn">
+            <image
+              class="get-steps-text"
+              src="/pkg_main/assets/img/hqbs.png"
+            ></image>
+            <image
+              class="eye-icon"
+              src="/pkg_main/assets/img/yanjing.png"
+            ></image>
+          </div>
+        </div>
+      </stack>
+
+      <!-- Today's Data Section -->
+      <div class="card-section first-card">
+        <div class="section-header">
+          <image
+            class="section-title-img"
+            src="/pkg_main/assets/img/jrsj.png"
+          ></image>
+          <image
+            class="eye-icon-small"
+            src="/pkg_main/assets/img/yanjing.png"
+          ></image>
+          <div class="spacer"></div>
+          <image
+            class="settings-icon"
+            src="/pkg_main/assets/img/shezhi.png"
+            onclick="openStepSettings"
+          ></image>
+        </div>
+
+        <div class="data-grid">
+          <div class="data-item">
+            <text class="data-val">{{ totalDistance }}</text>
+            <text class="data-key">公里(km)</text>
+          </div>
+          <div class="data-item">
+            <text class="data-val">{{ totalSteps }}</text>
+            <text class="data-key">步数(步)</text>
+          </div>
+          <div class="data-item">
+            <text class="data-val">{{ totalCalories }}</text>
+            <text class="data-key">消耗(kcal)</text>
+          </div>
+        </div>
+      </div>
+
+      <!-- BMI Section -->
+      <div class="card-section last-card">
+        <div class="section-header-bmi">
+          <image
+            class="bmi-title-img"
+            src="/pkg_main/assets/img/BMI.png"
+          ></image>
+          <image
+            class="eye-icon-small"
+            src="/pkg_main/assets/img/yanjing.png"
+          ></image>
+          <div class="spacer"></div>
+          <image
+            class="settings-icon"
+            src="/pkg_main/assets/img/shezhi.png"
+            onclick="openBmiSettings"
+          ></image>
+        </div>
+
+        <div class="bmi-content" if="{{!hasBmiData}}">
+          <image
+            class="no-data-img"
+            src="/pkg_main/assets/img/kong.png"
+          ></image>
+          <text class="no-data-text">暂无数据~</text>
+        </div>
+
+        <div class="bmi-data-container" if="{{hasBmiData}}">
+          <div class="data-grid">
+            <div class="data-item">
+              <text class="bmi-val">{{ bmiHeight }}</text>
+              <text class="data-key">身高(cm)</text>
+            </div>
+            <div class="data-item">
+              <text class="bmi-val">{{ bmiWeight }}</text>
+              <text class="data-key">体重(kg)</text>
+            </div>
+            <div class="data-item">
+              <text class="bmi-val">{{ bmiValue }}</text>
+              <text class="data-key">BMI(%)</text>
+            </div>
+          </div>
+
+          <div class="bmi-indicator-box">
+            <!-- Indicator Tag -->
+            <div class="indicator-tag" style="left: {{bmiIndicatorLeft}}px;">
+              <text class="indicator-text">{{ bmiStatus }}</text>
+              <div class="indicator-triangle"></div>
+            </div>
+
+            <!-- Color Bar -->
+            <div class="bmi-bar">
+              <div class="bar-segment blue-seg"></div>
+              <div class="bar-segment green-seg"></div>
+              <div class="bar-segment yellow-seg"></div>
+              <div class="bar-segment red-seg"></div>
+            </div>
+
+            <!-- Scale Labels -->
+            <div class="bmi-scale">
+              <text class="scale-text" style="left: 40px;">18.5</text>
+              <text class="scale-text" style="left: 83px;">24</text>
+              <text class="scale-text" style="left: 125px;">28</text>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div class="bottom-padding"></div> -->
+    </div>
+
+    <!-- Popup Modal -->
+    <div class="mask" if="{{showPopup}}">
+      <div class="dialog-box">
+        <block if="{{popupType === 'steps'}}">
+          <div class="dialog-title-container">
+            <image
+              class="dialog-title-img"
+              src="/pkg_main/assets/img/bsjl.png"
+            ></image>
+          </div>
+
+          <text class="input-label">运动时长（分钟）</text>
+          <input
+            class="input-field"
+            type="number"
+            placeholder="请输入运动时长"
+            value="{{inputDuration}}"
+            onchange="updateDuration"
+          />
+
+          <text class="input-label">运动距离（公里）</text>
+          <input
+            class="input-field"
+            type="number"
+            placeholder="请输入运动距离"
+            value="{{inputDistance}}"
+            onchange="updateDistance"
+          />
+        </block>
+
+        <block if="{{popupType === 'bmi'}}">
+          <text class="dialog-title">BMI数据</text>
+
+          <text class="input-label">身高（cm）</text>
+          <input
+            class="input-field"
+            type="number"
+            placeholder="请输入身高"
+            value="{{inputHeight}}"
+            onchange="updateHeight"
+          />
+
+          <text class="input-label">体重（kg）</text>
+          <input
+            class="input-field"
+            type="number"
+            placeholder="请输入体重"
+            value="{{inputWeight}}"
+            onchange="updateWeight"
+          />
+
+          <text class="input-label">BMI数值</text>
+          <input
+            class="input-field"
+            type="number"
+            placeholder="请输入BMI数值"
+            value="{{inputBmi}}"
+            onchange="updateBmi"
+          />
+        </block>
+
+        <div class="btn-row">
+          <div class="btn-cancel" onclick="closeSettings">
+            <image class="btn-img" src="/pkg_main/assets/img/qx.png"></image>
+          </div>
+          <div class="btn-add" onclick="saveData">
+            <image class="btn-img" src="/pkg_main/assets/img/tj_.png"></image>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import storage from '@system.storage'
+import router from '@system.router'
+
+export default {
+  data: {
+    showPopup: false,
+    popupType: '', // 'steps' or 'bmi'
+    inputDuration: '',
+    inputDistance: '',
+    inputHeight: '',
+    inputWeight: '',
+    inputBmi: '',
+    totalSteps: 0,
+    totalDistance: 0,
+    totalCalories: 0,
+    totalDuration: 0,
+    // BMI Data
+    hasBmiData: false,
+    bmiHeight: 0,
+    bmiWeight: 0,
+    bmiValue: 0,
+    bmiStatus: '理想',
+    bmiIndicatorLeft: 0
+  },
+  onInit() {
+    console.log('Jibu page initialized')
+    // Load saved data
+    this.loadData()
+  },
+  onShow() {
+    console.log('Jibu page onShow - reloading data')
+    // 每次页面显示时重新加载数据，确保BMI等数据实时更新
+    this.loadBmiData()
+    this.loadStepData()
+  },
+  getTodayDate() {
+    const date = new Date()
+    const y = date.getFullYear()
+    const m = (date.getMonth() + 1).toString().padStart(2, '0')
+    const d = date
+      .getDate()
+      .toString()
+      .padStart(2, '0')
+    return `${y}-${m}-${d}`
+  },
+  loadStepData() {
+    const that = this
+    const today = that.getTodayDate()
+
+    // Load today's step data
+    storage.get({
+      key: 'stepData',
+      success: function(data) {
+        if (data) {
+          const stepData = JSON.parse(data)
+
+          if (stepData.date === today) {
+            that.totalSteps = stepData.totalSteps || 0
+            that.totalDistance = stepData.totalDistance || 0
+            that.totalCalories = stepData.totalCalories || 0
+            that.totalDuration = stepData.totalDuration || 0
+          } else {
+            // New day, clear current data
+            that.totalSteps = 0
+            that.totalDistance = 0
+            that.totalCalories = 0
+            that.totalDuration = 0
+          }
+        }
+      }
+    })
+  },
+  loadBmiData() {
+    const that = this
+    // Load BMI data
+    storage.get({
+      key: 'bmiData',
+      success: function(data) {
+        console.log('Load bmiData:', data)
+        if (data) {
+          const bmiData = JSON.parse(data)
+          that.bmiHeight = bmiData.bmiHeight || 0
+          that.bmiWeight = bmiData.bmiWeight || 0
+
+          // 始终根据身高体重重新计算BMI，确保数据准确
+          if (bmiData.bmiHeight && bmiData.bmiWeight) {
+            // BMI = 体重(kg) / 身高²(m²)
+            const h_m = bmiData.bmiHeight / 100
+            that.bmiValue = parseFloat(
+              (bmiData.bmiWeight / (h_m * h_m)).toFixed(1)
+            )
+          } else if (bmiData.bmiValue) {
+            that.bmiValue = bmiData.bmiValue
+          } else {
+            that.bmiValue = 0
+          }
+
+          that.hasBmiData = bmiData.hasBmiData || false
+          console.log(
+            'BMI calculated - Height:',
+            that.bmiHeight,
+            'cm, Weight:',
+            that.bmiWeight,
+            'kg, BMI:',
+            that.bmiValue
+          )
+
+          if (that.hasBmiData) {
+            that.calculateBmiStatus()
+          }
+        }
+      }
+    })
+  },
+  loadData() {
+    this.loadStepData()
+    this.loadBmiData()
+  },
+  openStepSettings() {
+    this.popupType = 'steps'
+    this.showPopup = true
+  },
+  openBmiSettings() {
+    router.push({
+      uri: '/pkg_other/pages/BmiSetting'
+    })
+  },
+  closeSettings() {
+    this.inputDuration = ''
+    this.inputDistance = ''
+    this.inputHeight = ''
+    this.inputWeight = ''
+    this.inputBmi = ''
+    this.showPopup = false
+  },
+  updateDuration(e) {
+    this.inputDuration = e.value
+  },
+  updateDistance(e) {
+    this.inputDistance = e.value
+  },
+  updateHeight(e) {
+    this.inputHeight = e.value
+  },
+  updateWeight(e) {
+    this.inputWeight = e.value
+  },
+  updateBmi(e) {
+    this.inputBmi = e.value
+  },
+  calculateBmiStatus() {
+    // Calculate status and position
+    // Bar width is ~600px total assumption for calculation logic, but CSS handles layout.
+    // Visual Zones:
+    // 0-18.5 (Blue) -> 30% width
+    // 18.5-24 (Green) -> 30% width
+    // 24-28 (Yellow) -> 20% width
+    // 28+ (Red) -> 20% width
+
+    let barWidth = 600 // Let's assume total bar width in px
+    let pos = 0
+
+    if (this.bmiValue < 18.5) {
+      this.bmiStatus = '偏瘦'
+      // Map 0-18.5 to 0-30%
+      pos = (this.bmiValue / 18.5) * (barWidth * 0.3)
+    } else if (this.bmiValue < 24) {
+      this.bmiStatus = '理想'
+      // Map 18.5-24 to 30%-60%
+      // (val - 18.5) / 5.5
+      let percentInZone = (this.bmiValue - 18.5) / (24 - 18.5)
+      pos = barWidth * 0.3 + percentInZone * (barWidth * 0.3)
+    } else if (this.bmiValue < 28) {
+      this.bmiStatus = '偏胖'
+      // Map 24-28 to 60%-80%
+      let percentInZone = (this.bmiValue - 24) / (28 - 24)
+      pos = barWidth * 0.6 + percentInZone * (barWidth * 0.2)
+    } else {
+      this.bmiStatus = '肥胖'
+      // Map 28-35 to 80%-100% (capped)
+      let percentInZone = (this.bmiValue - 28) / (35 - 28)
+      if (percentInZone > 1) percentInZone = 1
+      pos = barWidth * 0.8 + percentInZone * (barWidth * 0.2)
+    }
+
+    // Offset for centering the bubble (bubble width approx 80px)
+    this.bmiIndicatorLeft = pos - 15 // Adjusted to center visually
+    if (this.bmiIndicatorLeft < 0) this.bmiIndicatorLeft = 0
+    if (this.bmiIndicatorLeft > barWidth - 40)
+      this.bmiIndicatorLeft = barWidth - 40
+  },
+  saveData() {
+    if (this.popupType === 'steps') {
+      this.addRecord()
+    } else if (this.popupType === 'bmi') {
+      this.bmiHeight = this.inputHeight
+      this.bmiWeight = this.inputWeight
+      this.bmiValue = parseFloat(this.inputBmi) || 0
+      this.hasBmiData = true
+
+      this.calculateBmiStatus()
+
+      // Save BMI Data
+      const bmiData = {
+        bmiHeight: this.bmiHeight,
+        bmiWeight: this.bmiWeight,
+        bmiValue: this.bmiValue,
+        hasBmiData: this.hasBmiData
+      }
+      storage.set({
+        key: 'bmiData',
+        value: JSON.stringify(bmiData)
+      })
+
+      this.closeSettings()
+    }
+  },
+
+  addRecord() {
+    const duration = parseFloat(this.inputDuration) || 0
+    const distance = parseFloat(this.inputDistance) || 0
+
+    console.log('addRecord called - duration:', duration, 'distance:', distance)
+
+    if (duration <= 0 && distance <= 0) {
+      console.log('No valid data to add')
+      return
+    }
+
+    // 1米 = 1步 = 0.05千卡
+    // 距离单位是公里，需要转换为米
+    const distanceInMeters = distance * 1000
+    const steps = Math.round(distanceInMeters)
+    const calories = Math.round(distanceInMeters * 0.05)
+
+    // 累加数据
+    this.totalSteps += steps
+    this.totalDistance = parseFloat((this.totalDistance + distance).toFixed(2))
+    this.totalCalories += calories
+    this.totalDuration += duration
+
+    const today = this.getTodayDate()
+    console.log(
+      'Today date:',
+      today,
+      'Steps:',
+      this.totalSteps,
+      'Duration:',
+      this.totalDuration,
+      'Calories:',
+      this.totalCalories
+    )
+
+    // Save today's step data
+    const stepData = {
+      totalSteps: this.totalSteps,
+      totalDistance: this.totalDistance,
+      totalCalories: this.totalCalories,
+      totalDuration: this.totalDuration,
+      date: today
+    }
+    storage.set({
+      key: 'stepData',
+      value: JSON.stringify(stepData),
+      success: function() {
+        console.log('stepData saved successfully')
+      }
+    })
+
+    // Save to history records
+    const that = this
+    const historyRecord = {
+      date: today,
+      steps: this.totalSteps,
+      distance: this.totalDistance,
+      calories: this.totalCalories,
+      duration: this.totalDuration
+    }
+
+    storage.get({
+      key: 'stepHistory',
+      success: function(data) {
+        let history = []
+        if (data) {
+          history = JSON.parse(data)
+        }
+        console.log('Existing history records:', history.length)
+
+        // Check if today's record exists
+        const existingIndex = history.findIndex(item => item.date === today)
+        if (existingIndex >= 0) {
+          // Update existing record
+          history[existingIndex] = {
+            date: today,
+            steps: that.totalSteps,
+            distance: that.totalDistance,
+            calories: that.totalCalories,
+            duration: that.totalDuration
+          }
+        } else {
+          // Add new record
+          history.push({
+            date: today,
+            steps: that.totalSteps,
+            distance: that.totalDistance,
+            calories: that.totalCalories,
+            duration: that.totalDuration
+          })
+        }
+
+        // Keep only last 90 days
+        if (history.length > 90) {
+          history = history.slice(-90)
+        }
+
+        // Save history
+        storage.set({
+          key: 'stepHistory',
+          value: JSON.stringify(history),
+          success: function() {
+            console.log('Step history saved successfully')
+          }
+        })
+      },
+      fail: function() {
+        // No existing history, create new
+        const newHistory = [
+          {
+            date: today,
+            steps: that.totalSteps,
+            distance: that.totalDistance,
+            calories: that.totalCalories,
+            duration: that.totalDuration
+          }
+        ]
+        storage.set({
+          key: 'stepHistory',
+          value: JSON.stringify(newHistory)
+        })
+      }
+    })
+
+    // 关闭弹窗
+    this.closeSettings()
+  }
+}
+</script>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #f5f8fa;
+}
+.scroll-wrapper {
+  flex-direction: column;
+}
+
+/* Top Section */
+.top-section {
+  width: 100%;
+  height: 254px; /* Increased height for better background coverage */
+}
+.top-bg {
+  width: 100%;
+  height: 100%;
+  resize-mode: cover;
+}
+.top-content {
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.7);
+  flex-direction: column;
+  align-items: center;
+  padding-top: 13px;
+  padding-bottom: 9px;
+  margin-top: 74px;
+}
+.header-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+  margin-left: 16px;
+  width: 100%;
+}
+.title-img {
+  height: 9px;
+  resize-mode: contain;
+}
+.eye-icon {
+  width: 11px;
+  height: 11px;
+  margin-left: 3px;
+  resize-mode: contain;
+}
+
+/* Circle */
+.circle-container {
+  width: 97px;
+  height: 97px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+.circle-backdrop {
+  width: 87px;
+  height: 87px;
+  border-radius: 43px;
+  background-color: rgba(255, 255, 255, 0.6); /* Frosted effect background */
+  position: absolute;
+}
+.circle-bg {
+  width: 100%;
+  height: 100%;
+  resize-mode: contain;
+}
+.circle-content {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+.circle-label {
+  font-size: 6px;
+  color: #333333;
+  margin-bottom: 2px;
+}
+.step-num-box {
+  flex-direction: row;
+  align-items: flex-end;
+}
+.step-num {
+  font-size: 20px;
+  font-weight: bold;
+  color: #000000;
+}
+.step-unit {
+  font-size: 6px;
+  color: #333333;
+  margin-bottom: 4px;
+  margin-left: 1px;
+}
+.circle-target {
+  font-size: 5px;
+  color: #666666;
+  margin-top: 1px;
+}
+
+/* Button */
+.green-btn {
+  width: 150px;
+  height: 27px;
+  background-color: #84f51e; /* Bright lime green */
+  border-radius: 13px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2px;
+}
+.get-steps-text {
+  height: 10px;
+  resize-mode: contain;
+}
+
+/* Card Sections */
+.card-section {
+  flex-direction: column;
+  background-color: #ffffff;
+  margin-left: 6px;
+  margin-right: 6px;
+  margin-top: 5px;
+  border-radius: 4px;
+  padding: 6px;
+}
+.first-card {
+  margin-top: 6px;
+  height: 74px;
+}
+.last-card {
+  flex: 1;
+  margin-bottom: 0;
+  padding-bottom: 11px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.section-header {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 6px;
+  height: 11px;
+}
+.section-title-img {
+  height: 9px;
+  resize-mode: contain;
+}
+.eye-icon-small {
+  width: 11px;
+  height: 11px;
+  margin-left: 2px;
+  resize-mode: contain;
+}
+.section-header-bmi {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 6px;
+  justify-content: space-between;
+}
+.bmi-title-img {
+  height: 10px;
+  resize-mode: contain;
+}
+.spacer {
+  flex: 1;
+}
+.settings-icon {
+  width: 9px;
+  height: 9px;
+  resize-mode: contain;
+}
+
+/* Data Grid */
+.data-grid {
+  flex-direction: row;
+  justify-content: space-around;
+}
+.data-item {
+  flex-direction: column;
+  align-items: center;
+}
+.data-val {
+  font-size: 11px;
+  color: #cccccc;
+  margin-bottom: 4px;
+}
+.data-key {
+  font-size: 7px;
+  color: #999999;
+}
+
+/* BMI Content */
+.bmi-content {
+  flex-direction: column;
+  align-items: center;
+  padding: 9px 0;
+  flex: 1;
+}
+.no-data-img {
+  width: 57px;
+  height: 57px;
+  resize-mode: contain;
+  margin-bottom: 4px;
+}
+.no-data-text {
+  font-size: 6px;
+  color: #cccccc;
+}
+
+/* BMI Data Styles */
+.bmi-data-container {
+  flex-direction: column;
+  padding-bottom: 4px;
+}
+.bmi-val {
+  font-size: 11px;
+  color: #000000;
+  margin-bottom: 4px;
+  font-weight: bold;
+}
+.bmi-indicator-box {
+  margin-top: 13px;
+  height: 27px;
+  width: 138px;
+  align-self: center;
+  position: relative;
+  flex-direction: column;
+}
+.bmi-bar {
+  margin-top: 8px;
+  width: 138px;
+  height: 4px;
+  border-radius: 1px;
+  background-color: #eeeeee;
+  flex-direction: row;
+  overflow: hidden;
+}
+.bar-segment {
+  height: 100%;
+}
+.blue-seg {
+  background-color: #6ed4ff;
+  width: 41px; /* 30% of 600 */
+}
+.green-seg {
+  background-color: #84f51e;
+  width: 41px; /* 30% of 600 */
+}
+.yellow-seg {
+  background-color: #ffd04b;
+  width: 27px; /* 20% of 600 */
+}
+.red-seg {
+  background-color: #ff5e5e;
+  flex: 1;
+}
+
+.indicator-tag {
+  position: absolute;
+  top: -11px; /* Moves above the bar */
+  flex-direction: column;
+  align-items: center;
+  width: 18px;
+}
+.indicator-text {
+  background-color: #84f51e;
+  color: #ffffff;
+  font-size: 5px;
+  padding: 1px 2px;
+  border-radius: 1px;
+}
+.indicator-triangle {
+  width: 0;
+  height: 0;
+  border-left: 2px solid transparent;
+  border-right: 2px solid transparent;
+  border-top: 2px solid #84f51e;
+  margin-top: 0;
+}
+
+.bmi-scale {
+  width: 138px;
+  height: 9px;
+  margin-top: 2px;
+  position: relative;
+}
+.scale-text {
+  position: absolute;
+  font-size: 5px;
+  color: #999999;
+}
+
+.bottom-padding {
+  height: 11px;
+}
+
+/* Popup Styles */
+.mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+}
+.dialog-box {
+  width: 200px;
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 9px;
+  flex-direction: column;
+  background: linear-gradient(#ffccaa, #ffffff 40%);
+}
+.dialog-title {
+  font-size: 8px;
+  font-weight: bold;
+  color: #000000;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 9px;
+  margin-top: 2px;
+}
+.dialog-title-container {
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 9px;
+  margin-top: 2px;
+}
+.dialog-title-img {
+  width: 50px;
+  height: 16px;
+  resize-mode: contain;
+}
+.input-label {
+  font-size: 6px;
+  color: #333333;
+  margin-bottom: 4px;
+  margin-top: 4px;
+}
+.input-field {
+  width: 100%;
+  height: 18px;
+  background-color: #f7f7f7;
+  border-radius: 2px;
+  padding-left: 4px;
+  font-size: 6px;
+  color: #333333;
+}
+.btn-row {
+  flex-direction: row;
+  justify-content: space-between;
+  margin-top: 13px;
+  width: 100%;
+}
+.btn-cancel {
+  width: 55px;
+  height: 20px;
+  border: 1px solid #000000;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+}
+.btn-img {
+  width: 26px;
+  height: 9px;
+  resize-mode: contain;
+}
+.btn-add {
+  width: 55px;
+  height: 20px;
+  background-color: #84f51e;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+.btn-text-add {
+  font-size: 7px;
+  font-weight: bold;
+  color: #000000;
+}
+</style>

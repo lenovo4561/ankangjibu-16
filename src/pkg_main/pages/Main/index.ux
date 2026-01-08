@@ -1,0 +1,244 @@
+<import name="jibu-page" src="./jibu.ux"></import>
+<import name="tongji-page" src="./tongji.ux"></import>
+<import name="heshui-page" src="./heshui.ux"></import>
+<import name="mine-page" src="./mine.ux"></import>
+
+<template>
+  <div class="main-page">
+    <tabs class="tabs" onchange="changeTab" index="{{currentIndex}}">
+      <tab-content class="tab-content">
+        <jibu-page id="jibu-page"></jibu-page>
+        <tongji-page id="tongji-page"></tongji-page>
+        <heshui-page id="heshui-page"></heshui-page>
+        <mine-page id="mine-page"></mine-page>
+      </tab-content>
+    </tabs>
+
+    <div class="tab-bar">
+      <div class="tab-item" onclick="clickTab(0)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 0 ? '/pkg_main/assets/img/jibu-s.png' : '/pkg_main/assets/img/jibu-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 0 ? '#FFFFFF' : '#999999'}}"
+          >计步</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(1)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 1 ? '/pkg_main/assets/img/tongji-s.png' : '/pkg_main/assets/img/tongji-u-1.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 1 ? '#FFFFFF' : '#999999'}}"
+          >统计</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(2)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 2 ? '/pkg_main/assets/img/heshui-s.png' : '/pkg_main/assets/img/heshui-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 2 ? '#FFFFFF' : '#999999'}}"
+          >喝水</text
+        >
+      </div>
+      <div class="tab-item" onclick="clickTab(3)">
+        <image
+          class="tab-icon"
+          src="{{currentIndex === 3 ? '/pkg_main/assets/img/mine-s.png' : '/pkg_main/assets/img/mine-u.png'}}"
+        ></image>
+        <text
+          class="tab-text"
+          style="color: {{currentIndex === 3 ? '#FFFFFF' : '#999999'}}"
+          >我的</text
+        >
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import device from '@system.device'
+import app from '@system.app'
+import storage from '@system.storage'
+const $apis = require('../../helper/apis').default
+
+export default {
+  private: {
+    currentIndex: 0
+  },
+  onInit() {
+    console.log('Main page initialized')
+    this.initUser()
+  },
+  onShow() {
+    // 页面显示时，通知当前 Tab 刷新数据
+    this.notifyCurrentTab()
+  },
+  changeTab(e) {
+    this.currentIndex = e.index
+    // Tab 切换时，通知新的 Tab 刷新数据
+    this.notifyCurrentTab()
+  },
+  clickTab(index) {
+    this.currentIndex = index
+    // Tab 点击切换时，通知新的 Tab 刷新数据
+    this.notifyCurrentTab()
+  },
+  notifyCurrentTab() {
+    const that = this
+    // 延迟执行，确保 Tab 切换完成
+    setTimeout(function() {
+      if (that.currentIndex === 0) {
+        const jibuPage = that.$child('jibu-page')
+        if (jibuPage && jibuPage.loadData) {
+          jibuPage.loadData()
+        }
+      } else if (that.currentIndex === 1) {
+        const tongjiPage = that.$child('tongji-page')
+        if (tongjiPage && tongjiPage.loadWeekData) {
+          tongjiPage.loadWeekData()
+        }
+      } else if (that.currentIndex === 2) {
+        const heshuiPage = that.$child('heshui-page')
+        if (heshuiPage && heshuiPage.loadData) {
+          heshuiPage.loadData()
+        }
+      }
+    }, 100)
+  },
+  initUser() {
+    Promise.all([
+      // 单独获取 OAID，避免受其他 ID 获取影响
+      new Promise((resolve, reject) => {
+        device.getOAID({
+          success: function(data) {
+            console.log(`获取oaid成功 ${JSON.stringify(data)}`)
+            resolve(data.oaid)
+          },
+          fail: function(data, code) {
+            console.log(`获取oaid失败 ${data} ${code}`)
+            resolve('')
+          }
+        })
+      }),
+      // 获取AndroidId
+      new Promise((resolve, reject) => {
+        if (device.getUserId) {
+          device.getUserId({
+            success: function(data) {
+              resolve(data.userId)
+            },
+            fail: function(data, code) {
+              resolve('')
+            }
+          })
+        } else {
+          device.getId({
+            type: ['user'],
+            success: function(data) {
+              resolve(data.user || '')
+            },
+            fail: function(data, code) {
+              resolve('')
+            }
+          })
+        }
+      }),
+      new Promise(resolve => {
+        device.getInfo({
+          success: function(data) {
+            resolve(data)
+          },
+          fail: function(data, code) {
+            console.error('get device info failed:', code)
+            resolve({})
+          }
+        })
+      })
+    ]).then(results => {
+      const oaid = results[0]
+      const androidId = results[1]
+      const deviceInfo = results[2]
+      const appInfo = app.getInfo()
+
+      const params = {
+        oaid: oaid,
+        android: androidId,
+        model: deviceInfo.model || '',
+        brand: deviceInfo.brand || '',
+        pn: appInfo.packageName || '',
+        app_version: appInfo.versionName || '',
+        os_version: deviceInfo.osVersionName || '',
+        qudao: 'vivo'
+      }
+
+      $apis.user
+        .init(params)
+        .then(data => {
+          console.info('User init success:', data)
+          if (data && data.user_token) {
+            storage.set({
+              key: 'user_token',
+              value: data.user_token
+            })
+          }
+        })
+        .catch(err => {
+          console.error('User init failed:', err)
+        })
+    })
+  }
+}
+</script>
+
+<style>
+.main-page {
+  flex-direction: column;
+  background-color: #ffffff;
+  height: 100%;
+}
+.tabs {
+  flex: 1;
+}
+.tab-content {
+  flex: 1;
+}
+.tab-bar {
+  position: fixed;
+  bottom: 4px;
+  left: 4px;
+  right: 4px;
+  height: 34px;
+  background-color: #1a1a1a;
+  border-radius: 17px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  padding-bottom: 0;
+  z-index: 1000;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+.tab-item {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  height: 100%;
+}
+.tab-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  margin-bottom: 1px;
+}
+.tab-text {
+  font-size: 5px;
+}
+</style>

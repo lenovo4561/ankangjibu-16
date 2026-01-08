@@ -1,0 +1,724 @@
+<template>
+  <div class="page">
+    <div class="scroll-wrapper">
+      <stack class="top-stack">
+        <!-- Background Image -->
+        <image
+          class="top-bg"
+          src="/pkg_main/assets/img/shouyedingbg.png"
+        ></image>
+
+        <div class="main-content">
+          <!-- Header -->
+          <div class="header-row">
+            <image
+              class="page-title-img"
+              src="/pkg_main/assets/img/tj.png"
+            ></image>
+            <image
+              class="eye-icon"
+              src="/pkg_main/assets/img/yanjing.png"
+            ></image>
+          </div>
+
+          <!-- Tabs (Steps, Duration, Consumption) -->
+          <div class="tabs-row">
+            <div
+              class="tab-btn {{currentTab === 0 ? 'tab-active' : 'tab-inactive'}}"
+              onclick="changeTab(0)"
+            >
+              <text
+                class="{{currentTab === 0 ? 'text-active' : 'text-inactive'}}"
+                >步数</text
+              >
+            </div>
+            <div
+              class="tab-btn {{currentTab === 1 ? 'tab-active' : 'tab-inactive'}}"
+              onclick="changeTab(1)"
+            >
+              <text
+                class="{{currentTab === 1 ? 'text-active' : 'text-inactive'}}"
+                >时长</text
+              >
+            </div>
+            <div
+              class="tab-btn {{currentTab === 2 ? 'tab-active' : 'tab-inactive'}}"
+              onclick="changeTab(2)"
+            >
+              <text
+                class="{{currentTab === 2 ? 'text-active' : 'text-inactive'}}"
+                >消耗</text
+              >
+            </div>
+          </div>
+
+          <!-- Date Navigator -->
+          <div class="date-nav">
+            <text class="nav-arrow" onclick="prevWeek">&lt;</text>
+            <text class="nav-date">{{ dateRangeStr }}</text>
+            <text class="nav-arrow" onclick="nextWeek">&gt;</text>
+          </div>
+
+          <!-- Summary Stats -->
+          <div class="stats-row" if="{{hasData}}">
+            <div class="stat-col">
+              <text class="stat-num">{{ avgVal }}</text>
+              <text class="stat-label">平均({{ unitStr }})</text>
+            </div>
+            <div class="stat-col">
+              <text class="stat-num">{{ totalVal }}</text>
+              <text class="stat-label">总计({{ unitStr }})</text>
+            </div>
+          </div>
+
+          <!-- Chart Section -->
+          <!-- Using a lightweight pure CSS/DIV implementation for minimum size (0kb dependency) -->
+          <div class="chart-wrapper">
+            <block if="{{!hasData}}">
+              <div class="no-data-container">
+                <image
+                  class="no-data-img"
+                  src="/pkg_main/assets/img/tongji-kong.png"
+                ></image>
+                <text class="no-data-text">暂无数据~</text>
+              </div>
+            </block>
+
+            <block else>
+              <div class="y-axis-col">
+                <text class="axis-label">{{ yLabels[4] }}</text>
+                <text class="axis-label">{{ yLabels[3] }}</text>
+                <text class="axis-label">{{ yLabels[2] }}</text>
+                <text class="axis-label">{{ yLabels[1] }}</text>
+                <text class="axis-label">{{ yLabels[0] }}</text>
+                <text class="axis-label">0</text>
+              </div>
+
+              <stack class="chart-area">
+                <!-- Grid Lines -->
+                <div class="grid-background">
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line box-border-bottom"></div>
+                </div>
+
+                <!-- Bars -->
+                <div class="bars-row">
+                  <block for="{{chartData}}">
+                    <div class="bar-cluster">
+                      <div class="bar-track">
+                        <div
+                          class="bar-fill"
+                          style="height: {{$item.percent}}%; background-color: #ff5500;"
+                        ></div>
+                      </div>
+                      <text class="x-label-date">{{ $item.date }}</text>
+                      <text class="x-label-day">{{ $item.day }}</text>
+                    </div>
+                  </block>
+                </div>
+              </stack>
+            </block>
+          </div>
+
+          <!-- Legend -->
+          <div class="legend-row" if="{{hasData}}">
+            <div class="legend-box"></div>
+            <text class="legend-text">{{ currentMonth }}</text>
+          </div>
+
+          <div style="height: 46px;"></div>
+        </div>
+      </stack>
+    </div>
+  </div>
+</template>
+
+<script>
+import storage from '@system.storage'
+
+export default {
+  data: {
+    currentTab: 0, // 0: Steps, 1: Duration, 2: Calories
+    unitStr: '步',
+    avgVal: '0',
+    totalVal: '0',
+    yLabels: [],
+    chartData: [],
+    hasData: false,
+
+    // Date Logic
+    selectedDate: '', // YYYY-MM-DD for picker value
+    dateRangeStr: '', // "MM月DD日-MM月DD日"
+    currentWeekStart: null, // Date object
+    currentMonth: '' // "YYYY年MM月" for legend
+  },
+  onInit() {
+    console.log('Statistics page initialized')
+
+    // Init Date: default to today (which is usually part of the week to display)
+    const now = new Date()
+    this.updateWeekRange(now)
+
+    // Load data from localStorage
+    this.loadWeekData()
+  },
+  onShow() {
+    console.log('Statistics page onShow - reloading data')
+    // 确保 currentWeekStart 已初始化，如果未初始化则使用当前日期
+    if (!this.currentWeekStart) {
+      const now = new Date()
+      this.updateWeekRange(now)
+    } else {
+      // 每次页面显示时重新加载数据，确保显示最新的统计数据
+      this.loadWeekData()
+    }
+  },
+  updateWeekRange(dateObj) {
+    // Calculate Monday of the week
+    // 创建新的 Date 对象，避免修改原始对象
+    const tempDate = new Date(dateObj.getTime())
+    const day = tempDate.getDay() // 0 is Sunday
+    const diff = tempDate.getDate() - day + (day === 0 ? -6 : 1) // adjust when day is sunday
+    tempDate.setDate(diff)
+    const monday = new Date(tempDate)
+    this.currentWeekStart = new Date(monday)
+
+    const sunday = new Date(monday)
+    sunday.setDate(monday.getDate() + 6)
+
+    // Update Strings
+    this.selectedDate = this.formatDateISO(monday) // Picker value
+    this.dateRangeStr = `${this.formatDateShort(monday)}-${this.formatDateShort(
+      sunday
+    )}`
+
+    // Update current month for legend
+    const year = monday.getFullYear()
+    const month = monday.getMonth() + 1
+    this.currentMonth = `${year}年${month}月`
+
+    // Load data for new week
+    this.loadWeekData()
+  },
+  formatDateISO(date) {
+    const y = date.getFullYear()
+    const m = (date.getMonth() + 1).toString().padStart(2, '0')
+    const d = date
+      .getDate()
+      .toString()
+      .padStart(2, '0')
+    return `${y}-${m}-${d}`
+  },
+  formatDateShort(date) {
+    const m = date.getMonth() + 1
+    const d = date.getDate()
+    return `${m}月${d}日`
+  },
+  getWeekDates() {
+    const dates = []
+    // 如果 currentWeekStart 未初始化，使用当前日期计算本周
+    if (!this.currentWeekStart) {
+      const now = new Date()
+      const day = now.getDay()
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1)
+      now.setDate(diff)
+      this.currentWeekStart = new Date(now)
+    }
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(this.currentWeekStart)
+      date.setDate(date.getDate() + i)
+      dates.push(this.formatDateISO(date))
+    }
+    return dates
+  },
+  loadWeekData() {
+    const that = this
+    const weekDates = this.getWeekDates()
+    console.log('Loading week data, weekDates:', JSON.stringify(weekDates))
+
+    storage.get({
+      key: 'stepHistory',
+      success: function(data) {
+        console.log('stepHistory data:', data)
+        let history = []
+        if (data) {
+          try {
+            const parsed = JSON.parse(data)
+            if (Array.isArray(parsed)) {
+              history = parsed
+            } else {
+              console.log('stepHistory is not an array, ignoring')
+            }
+          } catch (e) {
+            console.log('Failed to parse stepHistory, ignoring:', e)
+          }
+        }
+
+        // If stepHistory is empty/missing, fallback to stepData (today) so the stats page can still show data.
+        storage.get({
+          key: 'stepData',
+          success: function(stepDataStr) {
+            let stepData = null
+            if (stepDataStr) {
+              try {
+                stepData = JSON.parse(stepDataStr)
+              } catch (e) {
+                console.log('Failed to parse stepData:', e)
+              }
+            }
+
+            if (stepData && stepData.date) {
+              const inCurrentWeek = weekDates.indexOf(stepData.date) >= 0
+              if (inCurrentWeek) {
+                const upsertIndex = history.findIndex(
+                  item => item && item.date === stepData.date
+                )
+                const mergedRecord = {
+                  date: stepData.date,
+                  steps: stepData.totalSteps || stepData.steps || 0,
+                  duration: stepData.totalDuration || stepData.duration || 0,
+                  calories: stepData.totalCalories || stepData.calories || 0,
+                  distance: stepData.totalDistance || stepData.distance || 0
+                }
+                if (upsertIndex >= 0) {
+                  history[upsertIndex] = mergedRecord
+                } else {
+                  history.push(mergedRecord)
+                }
+              }
+            }
+
+            if (history.length > 0) {
+              console.log('Using history records:', history.length)
+              that.processWeekData(history, weekDates)
+            } else {
+              console.log('No stepHistory/stepData found')
+              that.hasData = false
+              that.chartData = []
+            }
+          },
+          fail: function() {
+            if (history.length > 0) {
+              that.processWeekData(history, weekDates)
+            } else {
+              console.log('No stepHistory and failed to load stepData')
+              that.hasData = false
+              that.chartData = []
+            }
+          }
+        })
+      },
+      fail: function(err) {
+        console.log('Failed to load stepHistory:', err)
+        // Fallback to stepData
+        storage.get({
+          key: 'stepData',
+          success: function(stepDataStr) {
+            if (!stepDataStr) {
+              that.hasData = false
+              that.chartData = []
+              return
+            }
+            try {
+              const stepData = JSON.parse(stepDataStr)
+              if (stepData && stepData.date) {
+                that.processWeekData(
+                  [
+                    {
+                      date: stepData.date,
+                      steps: stepData.totalSteps || stepData.steps || 0,
+                      duration:
+                        stepData.totalDuration || stepData.duration || 0,
+                      calories:
+                        stepData.totalCalories || stepData.calories || 0,
+                      distance: stepData.totalDistance || stepData.distance || 0
+                    }
+                  ],
+                  weekDates
+                )
+                return
+              }
+            } catch (e) {
+              console.log('Failed to parse stepData:', e)
+            }
+            that.hasData = false
+            that.chartData = []
+          },
+          fail: function() {
+            that.hasData = false
+            that.chartData = []
+          }
+        })
+      }
+    })
+  },
+  processWeekData(history, weekDates) {
+    const dayNames = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const chartData = []
+    let totalValue = 0
+    let maxValue = 0
+
+    // Get current tab type
+    const dataType = this.currentTab // 0: steps, 1: duration, 2: calories
+
+    const toNumber = v => {
+      const n = parseFloat(v)
+      return Number.isFinite(n) ? n : 0
+    }
+
+    // 解析日期字符串，避免时区问题
+    const parseLocalDate = dateStr => {
+      const parts = dateStr.split('-')
+      return new Date(
+        parseInt(parts[0]),
+        parseInt(parts[1]) - 1,
+        parseInt(parts[2])
+      )
+    }
+
+    weekDates.forEach((dateStr, index) => {
+      const record = history.find(item => item.date === dateStr)
+      let value = 0
+
+      if (record) {
+        if (dataType === 0) {
+          value = toNumber(
+            record.steps || record.totalSteps || record.step || 0
+          )
+        } else if (dataType === 1) {
+          value = toNumber(
+            record.duration || record.totalDuration || record.time || 0
+          )
+        } else if (dataType === 2) {
+          value = toNumber(
+            record.calories || record.totalCalories || record.kcal || 0
+          )
+        }
+      }
+
+      totalValue += value
+      if (value > maxValue) maxValue = value
+
+      const date = parseLocalDate(dateStr)
+      const dayOfWeek = date.getDay()
+
+      chartData.push({
+        date: `${date.getMonth() + 1}/${date.getDate()}`,
+        day: dayNames[dayOfWeek],
+        value: value,
+        percent: 0 // Will calculate after we know max
+      })
+    })
+
+    // Calculate percentages
+    if (maxValue > 0) {
+      chartData.forEach(item => {
+        item.percent = (item.value / maxValue) * 100
+      })
+    }
+
+    // Update chart data
+    this.chartData = chartData
+    this.hasData = totalValue > 0
+
+    // Calculate stats
+    if (this.hasData) {
+      const avgValue = Math.round(totalValue / 7)
+      this.avgVal = avgValue.toString()
+      this.totalVal = totalValue.toString()
+
+      // Update unit string
+      if (dataType === 0) {
+        this.unitStr = '步'
+      } else if (dataType === 1) {
+        this.unitStr = '分钟'
+      } else if (dataType === 2) {
+        this.unitStr = 'kcal'
+      }
+
+      // Calculate Y-axis labels
+      this.calculateYLabels(maxValue)
+    } else {
+      this.avgVal = '0'
+      this.totalVal = '0'
+    }
+  },
+  calculateYLabels(maxValue) {
+    const step = Math.ceil(maxValue / 5)
+    this.yLabels = []
+    for (let i = 0; i < 5; i++) {
+      this.yLabels.push((step * (i + 1)).toString())
+    }
+  },
+  changeTab(index) {
+    if (this.currentTab === index) return
+    this.currentTab = index
+    this.loadWeekData()
+  },
+  prevWeek() {
+    console.log('Previous Week')
+    if (this.currentWeekStart) {
+      const prevMonday = new Date(this.currentWeekStart)
+      prevMonday.setDate(prevMonday.getDate() - 7)
+      this.updateWeekRange(prevMonday)
+    }
+  },
+  nextWeek() {
+    console.log('Next Week')
+    if (this.currentWeekStart) {
+      const nextMonday = new Date(this.currentWeekStart)
+      nextMonday.setDate(nextMonday.getDate() + 7)
+      this.updateWeekRange(nextMonday)
+    }
+  }
+}
+</script>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #ffffff;
+}
+.scroll-wrapper {
+  flex-direction: column;
+}
+.top-stack {
+  width: 100%;
+  height: 694px;
+}
+.top-bg {
+  width: 100%;
+  height: 208px;
+  resize-mode: cover;
+}
+.main-content {
+  flex-direction: column;
+  width: 100%;
+  padding-left: 9px;
+  padding-right: 9px;
+  padding-top: 13px;
+  margin-top: 87px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+  min-height: 347px;
+}
+.header-row {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-top: 2px;
+}
+.page-title-img {
+  width: 27px;
+  height: 10px;
+  resize-mode: contain;
+}
+.eye-icon {
+  width: 11px;
+  height: 11px;
+  margin-left: 2px;
+  resize-mode: contain;
+}
+.tabs-row {
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.tab-btn {
+  width: 64px;
+  height: 23px;
+  border-radius: 11px;
+  justify-content: center;
+  align-items: center;
+}
+.tab-active {
+  background-color: #88ff00; /* Bright Green */
+}
+.tab-active-light {
+  background-color: #eaffcc; /* Light Green */
+}
+.tab-inactive {
+  background-color: #eaffcc; /* Light Green */
+}
+.text-active {
+  color: #000000;
+  font-size: 8px;
+  font-weight: bold;
+}
+.text-active-light {
+  color: #4a9e00;
+  font-size: 8px;
+  font-weight: bold;
+}
+.text-inactive {
+  color: #4a9e00;
+  font-size: 8px;
+  font-weight: bold;
+}
+
+/* Date Nav */
+.date-nav {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 13px;
+}
+.nav-arrow {
+  font-size: 9px;
+  font-weight: bold;
+  padding: 2px 4px;
+  color: #000000;
+}
+.nav-date {
+  font-size: 9px;
+  font-weight: bold;
+  color: #000000;
+}
+
+/* Stats */
+.stats-row {
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 18px;
+}
+.stat-col {
+  flex-direction: column;
+  align-items: center;
+}
+.stat-num {
+  font-size: 11px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 2px;
+}
+.stat-label {
+  font-size: 6px;
+  color: #999999;
+}
+
+/* Chart */
+.chart-wrapper {
+  flex-direction: row;
+  height: 208px;
+  width: 100%;
+}
+.y-axis-col {
+  flex-direction: column;
+  justify-content: space-between;
+  height: 189px; /* Aligned with grid height */
+  width: 13px;
+  padding-bottom: 9px; /* Align 0 with bottom line */
+  margin-top: 2px;
+}
+.axis-label {
+  font-size: 5px;
+  color: #999999;
+  text-align: right;
+  width: 100%;
+}
+.chart-area {
+  flex: 1;
+  height: 100%;
+  margin-left: 4px;
+  position: relative;
+}
+.grid-background {
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 180px; /* Chart drawing height */
+  position: absolute;
+  top: 4px;
+}
+.grid-line {
+  width: 100%;
+  height: 0px;
+  background-color: #eeeeee;
+  border-bottom-style: dashed; /* Note: quickapp might adhere to specific border styles only on divs */
+}
+.box-border-bottom {
+  border-bottom-width: 0px;
+  border-bottom-color: #cccccc;
+  border-bottom-style: solid;
+}
+.bars-row {
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding-top: 4px; /* match top of grid */
+}
+.bar-cluster {
+  flex-direction: column;
+  align-items: center;
+  width: 13px;
+  height: 100%;
+}
+.bar-track {
+  width: 9px;
+  height: 180px;
+  background-color: #fff9f5; /* Light skin/pink tone */
+  border-radius: 4px;
+  flex-direction: column-reverse; /* Bottom up */
+  align-items: center;
+}
+.bar-fill {
+  width: 9px; /* Matches track width */
+  border-radius: 4px;
+}
+.x-label-date {
+  margin-top: 3px;
+  font-size: 5px;
+  color: #666666;
+  text-align: center;
+}
+.x-label-day {
+  margin-top: 1px;
+  font-size: 5px;
+  color: #666666;
+  text-align: center;
+}
+
+/* Legend */
+.legend-row {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 4px;
+}
+.legend-box {
+  width: 6px;
+  height: 6px;
+  background-color: #ff5500;
+  margin-right: 3px;
+  border-radius: 1px;
+}
+.legend-text {
+  font-size: 6px;
+  color: #666666;
+}
+
+/* No Data State */
+.no-data-container {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.no-data-img {
+  width: 92px;
+  height: 92px;
+  resize-mode: contain;
+}
+.no-data-text {
+  font-size: 6px;
+  color: #cccccc;
+  margin-top: 6px;
+}
+</style>

@@ -1,0 +1,161 @@
+<template>
+  <div class="page">
+    <stack class="header">
+      <image class="header-bg" src="/pkg_main/assets/img/wodebg.png"></image>
+      <div class="user-content">
+        <div class="user-row">
+          <image class="avatar" src="/pkg_main/assets/img/tx.png"></image>
+          <text class="nickname">赵吾光</text>
+        </div>
+      </div>
+    </stack>
+
+    <div class="service-card">
+      <text class="service-title">其他服务</text>
+
+      <div class="service-item" onclick="toAgreement">
+        <div class="item-left">
+          <image
+            class="item-icon"
+            src="/pkg_main/assets/img/yonghuxieyi.png"
+          ></image>
+          <text class="item-text">用户协议</text>
+        </div>
+        <image
+          class="item-arrow"
+          src="/pkg_main/assets/img/jiantou.png"
+        ></image>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="service-item" onclick="toPrivacy">
+        <div class="item-left">
+          <image
+            class="item-icon"
+            src="/pkg_main/assets/img/yinsizhengce-1.png"
+          ></image>
+          <text class="item-text">隐私政策</text>
+        </div>
+        <image
+          class="item-arrow"
+          src="/pkg_main/assets/img/jiantou.png"
+        ></image>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from '@system.router'
+
+export default {
+  data: {},
+  onInit() {
+    console.log('Mine page initialized')
+  },
+  toAgreement() {
+    router.push({
+      uri: '/pkg_other/pages/Web',
+      params: {
+        url:
+          'https://api.51dsp.cn/index/agreement.do?pn=com.jsankangjb.akwellbeing',
+        title: '用户协议'
+      }
+    })
+  },
+  toPrivacy() {
+    router.push({
+      uri: '/pkg_other/pages/Web',
+      params: {
+        url:
+          'https://api.51dsp.cn/index/privacy.do?pn=com.jsankangjb.akwellbeing',
+        title: '隐私政策'
+      }
+    })
+  }
+}
+</script>
+
+<style>
+.page {
+  flex-direction: column;
+  background-color: #f7f7f7;
+}
+.header {
+  width: 100%;
+  height: 185px;
+}
+.header-bg {
+  width: 100%;
+  height: 100%;
+  resize-mode: cover;
+}
+.user-content {
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  padding-left: 9px;
+}
+.user-row {
+  flex-direction: row;
+  align-items: center;
+}
+.avatar {
+  width: 46px;
+  height: 46px;
+  border-radius: 23px;
+  border: 1px solid #ffffff;
+}
+.nickname {
+  margin-left: 6px;
+  font-size: 11px;
+  color: #000000;
+  font-weight: bold;
+}
+.service-card {
+  margin: -57px 6px 0 6px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 6px;
+  flex-direction: column;
+}
+.service-title {
+  font-size: 9px;
+  color: #000000;
+  font-weight: bold;
+  margin-bottom: 6px;
+  margin-top: 2px;
+}
+.service-item {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+}
+.item-left {
+  flex-direction: row;
+  align-items: center;
+}
+.item-icon {
+  width: 18px;
+  height: 18px;
+  margin-right: 5px;
+  resize-mode: contain;
+}
+.item-text {
+  font-size: 8px;
+  color: #333333;
+}
+.item-arrow {
+  width: 24px;
+  height: 36px;
+  resize-mode: contain;
+}
+.divider {
+  height: 1px;
+  background-color: #f0f0f0;
+  margin-left: 16px;
+}
+</style>

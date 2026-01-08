@@ -50,27 +50,31 @@
       "pages/Splash": {
         "component": "index"
       },
-      "pages/Web": {
+      "pkg_other/pages/Web": {
         "component": "index"
       },
-      "pages/BmiSetting": {
+      "pkg_other/pages/BmiSetting": {
         "component": "index"
       },
-      "pages/Main": {
+      "pkg_main/pages/Main": {
         "component": "index"
       },
-      "pages/Demo": {
+      "pkg_other/pages/Demo": {
         "component": "index"
       },
-      "pages/DemoDetail": {
+      "pkg_other/pages/DemoDetail": {
         "component": "index"
       }
     }
   },
   "subpackages": [
     {
-      "name": "pages",
-      "resource": "pages"
+      "name": "pkg_main",
+      "resource": "pkg_main"
+    },
+    {
+      "name": "pkg_other",
+      "resource": "pkg_other"
     }
   ],
   "display": {
@@ -82,26 +86,26 @@
         "titleBar": false,
         "menu": false
       },
-      "pages/Web": {
+      "pkg_other/pages/Web": {
         "titleBarText": "详情",
         "menu": false
       },
-      "pages/Main": {
+      "pkg_main/pages/Main": {
         "titleBar": false,
         "menu": false
       },
-      "pages/BmiSetting": {
+      "pkg_other/pages/BmiSetting": {
         "titleBar": false,
         "statusBar": {
           "immersive": true,
           "textStyle": "dark"
         }
       },
-      "pages/Demo": {
+      "pkg_other/pages/Demo": {
         "titleBarText": "快应用示例模版",
         "menu": false
       },
-      "pages/DemoDetail": {
+      "pkg_other/pages/DemoDetail": {
         "titleBarText": "详情页"
       }
     }

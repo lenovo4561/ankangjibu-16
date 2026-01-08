@@ -1,11 +1,11 @@
 <template>
   <div class="splash-container">
     <!-- Background Image - Full Screen -->
-    <image class="bg-img" src="/assets/img/bg.png"></image>
+    <image class="bg-img" src="/assets/images/bg.jpg"></image>
 
     <!-- Center Logo -->
     <div class="center-section">
-      <image class="logo-img" src="/assets/img/logo.png"></image>
+      <image class="logo-img" src="/assets/images/logo.png"></image>
     </div>
 
     <!-- Privacy Modal -->
@@ -18,7 +18,9 @@
             <a class="link" onclick="openPrivacy">《隐私政策》</a>
             <span>及</span>
             <a class="link" onclick="openAgreement">《用户协议》</a>
-            <span>，我们将严格遵守您同意的各项条款使用您的信息，以便为您提供更好的服务。点击"同意"意味着您自愿遵守《隐私政策》，我们将严格保护您的个人信息，确保信息安全。</span>
+            <span
+              >，我们将严格遵守您同意的各项条款使用您的信息，以便为您提供更好的服务。点击"同意"意味着您自愿遵守《隐私政策》，我们将严格保护您的个人信息，确保信息安全。</span
+            >
           </text>
         </div>
         <div class="modal_buttons">
@@ -89,18 +91,20 @@ export default {
   },
   openPrivacy() {
     router.push({
-      uri: '/pages/Web',
+      uri: '/pkg_other/pages/Web',
       params: {
-        url: 'https://api.51dsp.cn/index/privacy.do?pn=com.jsankangjb.akwellbeing',
+        url:
+          'https://api.51dsp.cn/index/privacy.do?pn=com.jsankangjb.akwellbeing',
         title: '隐私政策'
       }
     })
   },
   openAgreement() {
     router.push({
-      uri: '/pages/Web',
+      uri: '/pkg_other/pages/Web',
       params: {
-        url: 'https://api.51dsp.cn/index/agreement.do?pn=com.jsankangjb.akwellbeing',
+        url:
+          'https://api.51dsp.cn/index/agreement.do?pn=com.jsankangjb.akwellbeing',
         title: '用户协议'
       }
     })
@@ -119,7 +123,7 @@ export default {
   },
   navigateToHome() {
     router.replace({
-      uri: '/pages/Main'
+      uri: '/pkg_main/pages/Main'
     })
   }
 }
@@ -201,7 +205,7 @@ export default {
 }
 
 .link {
-  color: #4A90E2;
+  color: #4a90e2;
   text-decoration: underline;
 }
 
@@ -213,7 +217,7 @@ export default {
 .btn_primary {
   width: 100%;
   height: 25px;
-  background: linear-gradient(90deg, #4A90E2 0%, #357ABD 100%);
+  background: linear-gradient(90deg, #4a90e2 0%, #357abd 100%);
   border-radius: 12px;
   justify-content: center;
   align-items: center;
@@ -236,7 +240,7 @@ export default {
 }
 
 .btn_text_secondary {
-  color: #4A90E2;
+  color: #4a90e2;
   font-size: 10px;
   font-weight: bold;
 }
