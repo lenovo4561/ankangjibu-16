@@ -35,7 +35,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import './../../assets/styles/style.scss';
+@import './../../../pkg_main/components/CardDemo/assets/styles.scss';
 
 .wrapper {
   @include flex-box-mixins(column, center, center);

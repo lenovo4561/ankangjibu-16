@@ -101,9 +101,6 @@
               ></image>
             </div>
           </div>
-
-          <!-- Bottom Padding -->
-          <div style="height: 34px;"></div>
         </div>
 
         <!-- Modal -->
@@ -389,36 +386,37 @@ export default {
 }
 .top-stack {
   width: 100%;
-  height: 694px;
+  height: 100%;
 }
 .top-bg {
   width: 100%;
-  height: 208px;
+  height: 150px;
 }
 .cartoon-layer {
   width: 100%;
   justify-content: flex-end; /* Align right */
   padding-right: 6px;
-  padding-top: 13px;
+  padding-top: 10px;
 }
 .cartoon-img {
-  width: 138px;
-  height: 162px;
+  width: 110px;
+  height: 130px;
 }
 
 .main-content {
   flex-direction: column;
   width: 100%;
-  margin-top: 87px;
+  margin-top: 80px;
   background-color: rgba(255, 255, 255, 0.9);
   border-top-left-radius: 13px;
   border-top-right-radius: 13px;
-  padding: 9px;
+  padding: 7px 9px;
+  flex: 1;
 }
 
 .tips-row {
   flex-direction: row;
-  margin-bottom: 9px;
+  margin-bottom: 5px;
 }
 .tips-tag {
   background-color: #ffe4d6;
@@ -437,13 +435,13 @@ export default {
 
 .info-section {
   flex-direction: column;
-  margin-bottom: 13px;
+  margin-bottom: 8px;
 }
 .title-row {
   flex-direction: row;
   align-items: center;
-  margin-top: 4px;
-  margin-bottom: 11px;
+  margin-top: 2px;
+  margin-bottom: 6px;
 }
 .cup-title {
   font-size: 11px;
@@ -472,18 +470,18 @@ export default {
   width: 100%;
   align-items: center;
   justify-content: center;
-  margin-top: 4px;
-  margin-bottom: 13px;
+  margin-top: 2px;
+  margin-bottom: 8px;
 }
 .hero-img {
-  width: 173px;
-  height: 173px;
+  width: 180px;
+  height: 180px;
 }
 
 .cups-row {
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 13px;
+  margin-bottom: 8px;
 }
 .cup-item {
   flex-direction: column;
@@ -531,6 +529,7 @@ export default {
 .action-area {
   width: 100%;
   align-items: center;
+  margin-top:20px
 }
 .action-btn {
   width: 100%;

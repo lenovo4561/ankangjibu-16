@@ -5,7 +5,7 @@
 
     <!-- 中间指针 (固定不动) -->
     <div class="pointer-container">
-      <image class="pointer-img" src="/pkg_other/assets/img/zhishi.png"></image>
+      <image class="pointer-img" src="/pkg_main/assets/img/zhishi.png"></image>
     </div>
 
     <!-- 顶层透明触摸层 -->

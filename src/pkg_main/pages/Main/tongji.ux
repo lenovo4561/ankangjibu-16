@@ -130,7 +130,6 @@
             <text class="legend-text">{{ currentMonth }}</text>
           </div>
 
-          <div style="height: 46px;"></div>
         </div>
       </stack>
     </div>
@@ -488,11 +487,11 @@ export default {
 }
 .top-stack {
   width: 100%;
-  height: 694px;
+  height: 100%;
 }
 .top-bg {
   width: 100%;
-  height: 208px;
+  height: 150px;
   resize-mode: cover;
 }
 .main-content {
@@ -500,17 +499,17 @@ export default {
   width: 100%;
   padding-left: 9px;
   padding-right: 9px;
-  padding-top: 13px;
-  margin-top: 87px;
+  padding-top: 10px;
+  margin-top: 50px;
   background-color: rgba(255, 255, 255, 0.9);
   border-top-left-radius: 13px;
   border-top-right-radius: 13px;
-  min-height: 347px;
+  flex: 1;
 }
 .header-row {
   flex-direction: row;
   align-items: center;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
   padding-top: 2px;
 }
 .page-title-img {
@@ -527,7 +526,7 @@ export default {
 .tabs-row {
   flex-direction: row;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 .tab-btn {
   width: 64px;
@@ -661,7 +660,7 @@ export default {
 }
 .bar-track {
   width: 9px;
-  height: 180px;
+  height: 150px;
   background-color: #fff9f5; /* Light skin/pink tone */
   border-radius: 4px;
   flex-direction: column-reverse; /* Bottom up */

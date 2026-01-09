@@ -1,11 +1,11 @@
 <template>
   <div class="splash-container">
     <!-- Background Image - Full Screen -->
-    <image class="bg-img" src="/assets/images/bg.jpg"></image>
+    <image class="bg-img" src="/pkg_main/assets/images/bg.jpg"></image>
 
     <!-- Center Logo -->
     <div class="center-section">
-      <image class="logo-img" src="/assets/images/logo.png"></image>
+      <image class="logo-img" src="/pkg_main/assets/images/logo.png"></image>
     </div>
 
     <!-- Privacy Modal -->
@@ -87,6 +87,11 @@ export default {
       app.terminate()
     } catch (e) {
       console.error('退出应用失败:', e)
+      // 如果 terminate 失败，尝试使用 exit
+      const appModule = require('@system.app')
+      if (appModule && appModule.exit) {
+        appModule.exit()
+      }
     }
   },
   openPrivacy() {

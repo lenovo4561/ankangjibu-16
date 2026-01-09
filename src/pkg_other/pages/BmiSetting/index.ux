@@ -1,20 +1,20 @@
-<import name="scale-ruler" src="./ScaleRuler.ux"></import>
+﻿<import name="scale-ruler" src="./ScaleRuler.ux"></import>
 
 <template>
   <div class="page">
     <!-- Top Background -->
     <image
       class="top-bg"
-      src="/pkg_other/assets/img/bg_.png"
+      src="/pkg_main/assets/img/bg_.png"
       resize-mode="contain"
     ></image>
 
     <!-- Navbar -->
     <div class="navbar">
       <div class="back-btn" onclick="goBack">
-        <image class="back-icon" src="/pkg_other/assets/img/back.png"></image>
+        <image class="back-icon" src="/pkg_main/assets/img/back.png"></image>
       </div>
-      <image class="title-img" src="/pkg_other/assets/img/sgtz.png"></image>
+      <image class="title-img" src="/pkg_main/assets/img/sgtz.png"></image>
       <div class="placeholder"></div>
     </div>
 
@@ -23,10 +23,10 @@
       <div class="section">
         <div class="value-display">
           <div class="label-row">
-            <image class="label-img" src="/pkg_other/assets/img/sg.png"></image>
+            <image class="label-img" src="/pkg_main/assets/img/sg.png"></image>
             <image
               class="label-eye"
-              src="/pkg_other/assets/img/yanjing.png"
+              src="/pkg_main/assets/img/yanjing.png"
             ></image>
           </div>
           <div class="value-row">
@@ -50,10 +50,10 @@
       <div class="section">
         <div class="value-display">
           <div class="label-row">
-            <image class="label-img" src="/pkg_other/assets/img/tz.png"></image>
+            <image class="label-img" src="/pkg_main/assets/img/tz.png"></image>
             <image
               class="label-eye"
-              src="/pkg_other/assets/img/yanjing.png"
+              src="/pkg_main/assets/img/yanjing.png"
             ></image>
           </div>
           <div class="value-row">
@@ -78,12 +78,12 @@
         <div class="confirm-btn" onclick="saveData">
           <image
             class="btn-text-img"
-            src="/pkg_other/assets/img/qd.png"
+            src="/pkg_main/assets/img/qd.png"
             resize-mode="contain"
           ></image>
           <image
             class="btn-eye"
-            src="/pkg_other/assets/img/yanjing2_.png"
+            src="/pkg_main/assets/img/yanjing2_.png"
           ></image>
         </div>
       </div>
